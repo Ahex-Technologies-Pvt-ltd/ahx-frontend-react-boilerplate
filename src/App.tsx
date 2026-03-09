@@ -11,6 +11,8 @@ function App() {
     console.log("test");
     console.log("name");
     console.log("krishna");
+    console.log("krishna");
+
 
     return (
         <>
