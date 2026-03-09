@@ -9,6 +9,7 @@ import './App.css';
 function App() {
     const [count, setCount] = useState(0);
     console.log("test");
+    console.log("name");
 
     return (
         <>
