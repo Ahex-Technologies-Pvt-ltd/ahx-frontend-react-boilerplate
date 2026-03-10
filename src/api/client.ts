@@ -9,12 +9,12 @@ import type { ApiError, ApiResponse, RawBackendError, RequestOptions } from './t
 
 
 
-const IS_DEV = import.meta.env.DEV;
+// const IS_DEV = import.meta.env.DEV;
 const BASE_URL = import.meta.env.VITE_API_BASE_URL as string | undefined;
 
-if (!BASE_URL && IS_DEV) {
-    console.warn('[ApiClient] VITE_API_BASE_URL is not set.');
-}
+// if (!BASE_URL && IS_DEV) {
+//     console.warn('[ApiClient] VITE_API_BASE_URL is not set.');
+// }
 
 const axiosInstance: AxiosInstance = axios.create({
     baseURL: BASE_URL,
@@ -31,14 +31,6 @@ const axiosInstance: AxiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         if (!config.headers) config.headers = new axios.AxiosHeaders();
-
-        if (IS_DEV) {
-            console.debug(`[ApiClient] ▶ ${config.method?.toUpperCase()} ${config.url}`, {
-                params: config.params,
-                data: config.data,
-            });
-        }
-
         return config;
     },
     (error: unknown) => Promise.reject(error),
@@ -48,22 +40,11 @@ axiosInstance.interceptors.request.use(
 
 axiosInstance.interceptors.response.use(
     (response: AxiosResponse<ApiResponse<unknown>>) => {
-        if (IS_DEV) {
-            console.debug(`[ApiClient] ◀ ${response.status} ${response.config.url}`, response.data);
-        }
-
         // Unwrap the backend envelope — callers receive only `data`
         return { ...response, data: response.data.data };
     },
     (error: AxiosError<{ success: false; message?: string; error?: RawBackendError | string }>) => {
         const apiError = normaliseError(error);
-
-        if (IS_DEV) {
-            console.error(
-                `[ApiClient] ✖ ${apiError.statusCode} ${error.config?.url ?? ''}`,
-                apiError,
-            );
-        }
 
         return Promise.reject(apiError);
     },
