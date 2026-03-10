@@ -9,7 +9,7 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 
 
 export default defineConfig([
-    globalIgnores(['dist']),
+    globalIgnores(['dist', 'coverage']),
     {
         files: ['**/*.{js,jsx,ts,tsx}'],
 
@@ -30,12 +30,12 @@ export default defineConfig([
         },
 
         rules: {
-            "import/newline-after-import": ["error", { count: 3 }],
+            'import/newline-after-import': ['error', { count: 3 }],
 
-            indent: ["error", 4, { SwitchCase: 1 }],
+            indent: ['error', 4, { SwitchCase: 1 }],
 
-            "no-console": "warn",
-            semi: ["error", "always"],
+            'no-console': 'warn',
+            semi: ['error', 'always'],
         },
     },
 ]);

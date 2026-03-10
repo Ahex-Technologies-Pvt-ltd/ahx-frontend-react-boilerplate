@@ -3,7 +3,7 @@
 These guidelines define the standard Git workflow that every developer
 must follow to maintain a clean repository and avoid conflicts.
 
-------------------------------------------------------------------------
+---
 
 # 1. Branch Naming Convention
 
@@ -14,23 +14,23 @@ naming convention:
 
 ### Example
 
-    user-krishna/login-api    
+    user-krishna/login-api
 
 ### Rules
 
--   Always create branches from the latest `master`
--   Feature branches must be descriptive
--   Avoid spaces; use hyphens instead
+- Always create branches from the latest `master`
+- Feature branches must be descriptive
+- Avoid spaces; use hyphens instead
 
 ### Command Example
 
-``` bash
+```bash
 git checkout master
 git pull origin master
 git checkout -b user-krishna/login-api
 ```
 
-------------------------------------------------------------------------
+---
 
 # 2. Pull Latest Changes from Master Before Pushing
 
@@ -46,7 +46,7 @@ of the latest codebase.
 
 If there are uncommitted changes:
 
-``` bash
+```bash
 git stash
 ```
 
@@ -54,15 +54,13 @@ This temporarily saves your work.
 
 ### Step 2 --- Pull Latest Changes from Master
 
-``` bash
+```bash
 git pull origin master
 ```
 
-
-
 ### Step 3 --- Reapply Stashed Changes
 
-``` bash
+```bash
 git stash pop
 ```
 
@@ -70,13 +68,13 @@ Your previous changes will be restored.
 
 ### Step 4 --- Commit and Push
 
-``` bash
+```bash
 git add .
 git commit -m "Implemented login API"
 git push origin user-krishna/login-api
 ```
 
-------------------------------------------------------------------------
+---
 
 # 3. Raise a Pull Request (PR)
 
@@ -89,16 +87,15 @@ Once development is complete:
 
 Ensure:
 
--   Code builds successfully
--   No console errors
--   Code follows project standards
--   Feature is tested
+- Code builds successfully
+- No console errors
+- Code follows project standards
+- Feature is tested
 
 ### Inform the Team
 
 After creating the PR, share the PR link in the team communication
 channel.
-
 
 # 4. Handling Conflicts When Multiple Developers Work on Same File
 
@@ -111,20 +108,20 @@ In this case, your branch must be rebased with the latest master.
 
 ### Step 1 --- Pull Latest Master
 
-``` bash
+```bash
 git checkout master
 git pull origin master
 ```
 
 ### Step 2 --- Switch to Your Branch
 
-``` bash
+```bash
 git checkout user-krishna/login-api
 ```
 
 ### Step 3 --- Rebase with Master
 
-``` bash
+```bash
 git rebase master
 ```
 
@@ -144,34 +141,34 @@ Remove the markers and keep the correct code.
 
 ### Step 5 --- Continue Rebase
 
-``` bash
+```bash
 git add .
 git rebase --continue
 ```
 
 ### Step 6 --- Force Push (after rebase)
 
-``` bash
+```bash
 git push origin user-krishna/login-api --force
 ```
 
-------------------------------------------------------------------------
+---
 
 # Important Best Practices
 
 ## Always
 
--   Pull latest `master` before starting work
--   Keep PRs small and focused
--   Write meaningful commit messages
+- Pull latest `master` before starting work
+- Keep PRs small and focused
+- Write meaningful commit messages
 
 ## Never
 
--   Push directly to `master`
--   Commit unrelated changes in one PR
--   Ignore merge conflicts
+- Push directly to `master`
+- Commit unrelated changes in one PR
+- Ignore merge conflicts
 
-------------------------------------------------------------------------
+---
 
 # Recommended Workflow Summary
 
