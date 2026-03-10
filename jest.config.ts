@@ -13,19 +13,22 @@ const config: Config = {
         '\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/src/test/__mocks__/fileMock.ts',
     },
     transform: {
-        '^.+\\.(ts|tsx)$': ['@swc/jest', {
-            jsc: {
-                parser: {
-                    syntax: 'typescript',
-                    tsx: true,
-                },
-                transform: {
-                    react: {
-                        runtime: 'automatic',
+        '^.+\\.(ts|tsx)$': [
+            '@swc/jest',
+            {
+                jsc: {
+                    parser: {
+                        syntax: 'typescript',
+                        tsx: true,
+                    },
+                    transform: {
+                        react: {
+                            runtime: 'automatic',
+                        },
                     },
                 },
             },
-        }],
+        ],
     },
     collectCoverageFrom: [
         'src/**/*.{ts,tsx}',
@@ -34,14 +37,8 @@ const config: Config = {
         '!src/test/**',
         '!src/**/__tests__/**',
     ],
-    coveragePathIgnorePatterns: [
-        '/node_modules/',
-        '/dist/',
-    ],
-    testMatch: [
-        '**/__tests__/**/*.(test|spec).(ts|tsx)',
-        '**/*.(test|spec).(ts|tsx)',
-    ],
+    coveragePathIgnorePatterns: ['/node_modules/', '/dist/'],
+    testMatch: ['**/__tests__/**/*.(test|spec).(ts|tsx)', '**/*.(test|spec).(ts|tsx)'],
 };
 
 export default config;

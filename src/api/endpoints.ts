@@ -1,0 +1,18 @@
+export const API_ENDPOINTS = {
+    AUTH: {
+        LOGIN: '/auth/login',
+        LOGOUT: '/auth/logout',
+        PROFILE: '/auth/profile',
+        FORGOT_PASSWORD: '/auth/forgot-password',
+        RESET_PASSWORD: '/auth/reset-password',
+        REFRESH: '/auth/refresh',
+    },
+    USERS: {
+        LIST: '/users',
+        CREATE: '/users',
+        DETAIL: (id: string) => `/users/${id}`,
+        UPDATE: (id: string) => `/users/${id}`,
+        PATCH: (id: string) => `/users/${id}`,
+        DELETE: (id: string) => `/users/${id}`,
+    },
+} as const;
