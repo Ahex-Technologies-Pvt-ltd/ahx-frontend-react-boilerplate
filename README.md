@@ -51,6 +51,13 @@ Implemented location:
 
 - `src/context/auth-context/`
 
+Supporting API layer:
+
+- `src/api/client.ts`
+- `src/api/endpoints.ts`
+- `src/api/types.ts`
+- `src/api/utils.ts`
+
 Main capabilities:
 
 - Calls profile endpoint on provider mount.
@@ -74,7 +81,9 @@ The provider is built to handle wrapped API responses like:
 
 Types are defined in:
 
-- `src/context/auth-context/types.ts`
+- `src/api/types.ts`
+
+The auth provider uses the shared API client (`apiClient.instance`) so it follows common interceptors and normalized error handling used by the rest of the app.
 
 ### Auth Modes
 
@@ -87,6 +96,11 @@ Default config file:
 
 - `src/context/auth-context/config.ts`
 
+Auth endpoint defaults now come from shared endpoint constants:
+
+- `API_ENDPOINTS.AUTH.PROFILE`
+- `API_ENDPOINTS.AUTH.LOGOUT`
+
 ### Session Cookie Clear Flow
 
 In cookie mode, `logout()`:
@@ -96,6 +110,8 @@ In cookie mode, `logout()`:
 3. Clears local auth state
 
 This keeps frontend state deterministic even if network logout fails.
+
+In bearer mode, `logout()` clears the configured token storage key and local auth state.
 
 ### How To Use In This Project
 
@@ -122,14 +138,15 @@ VITE_AUTH_MODE=cookie
 
 To use this in another project:
 
-1. Copy folder `src/context/auth-context/`
+1. Copy folders `src/context/auth-context/` and `src/api/`
 2. Update `src/context/auth-context/config.ts`:
    - `MODE_DEFAULTS.cookie`
    - `MODE_DEFAULTS.bearer`
    - `APP_AUTH_OVERRIDES`
-3. Wrap app root with one provider using mode key only
-4. Set env values (`VITE_API_BASE_URL`, `VITE_AUTH_MODE`)
-5. Use `useAuth()` in pages/components
+3. Update `src/api/endpoints.ts` if your backend path contracts differ
+4. Wrap app root with one provider using mode key only
+5. Set env values (`VITE_API_BASE_URL`, `VITE_AUTH_MODE`)
+6. Use `useAuth()` in pages/components
 
 Reusable standard pattern:
 
@@ -145,18 +162,24 @@ Why this is standard:
 
 - `main.tsx` passes only auth mode key.
 - Endpoint paths and mode behavior are centralized in `config.ts`.
+- Endpoint values are shared through `src/api/endpoints.ts` constants.
+- API success/error handling is centralized in `src/api/client.ts` interceptors.
 - New projects only edit config defaults/overrides, not provider internals.
 
 Important for reuse across projects:
 
 - Each project may have different auth endpoints.
-- Update these per project in `MODE_DEFAULTS`:
-  - `profilePath`
-  - `logoutPath`
+- Primary update point: `src/api/endpoints.ts`
+    - `API_ENDPOINTS.AUTH.PROFILE`
+    - `API_ENDPOINTS.AUTH.LOGOUT`
+- Optional override point: `src/context/auth-context/config.ts`
+    - `MODE_DEFAULTS.cookie.profilePath` / `MODE_DEFAULTS.cookie.logoutPath`
+    - `MODE_DEFAULTS.bearer.profilePath` / `MODE_DEFAULTS.bearer.logoutPath`
+    - Use this only when a project needs mode-specific endpoint differences.
 - Example per project:
-  - Project A: `/auth/profile`, `/auth/logout`
-  - Project B: `/users/me`, `/session/logout`
-  - Project C: `/v1/account/profile`, `/v1/auth/signout`
+    - Project A: `API_ENDPOINTS.AUTH.PROFILE = /auth/profile`, `API_ENDPOINTS.AUTH.LOGOUT = /auth/logout`
+    - Project B: `API_ENDPOINTS.AUTH.PROFILE = /users/me`, `API_ENDPOINTS.AUTH.LOGOUT = /session/logout`
+    - Project C: `API_ENDPOINTS.AUTH.PROFILE = /v1/account/profile`, `API_ENDPOINTS.AUTH.LOGOUT = /v1/auth/signout`
 
 You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
