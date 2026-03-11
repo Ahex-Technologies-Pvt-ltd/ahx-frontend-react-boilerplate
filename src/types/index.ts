@@ -1,5 +1,8 @@
 export type {
     AuthUser,
+    AuthState,
+    AuthProviderConfig,
+    AuthProviderProps,
     LoginPayload,
     LoginResponse,
     ForgotPasswordPayload,

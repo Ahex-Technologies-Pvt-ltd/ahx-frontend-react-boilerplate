@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-import type { AuthState } from './types';
+import type { AuthState } from '../../types';
 
 
 

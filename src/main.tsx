@@ -2,8 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.tsx';
-import { AuthProvider } from './context/auth-context';
-import { getAppAuthConfig } from './context/auth-context/config';
+import { AuthProvider, getAppAuthConfig } from './context/auth-context';
 
 
 

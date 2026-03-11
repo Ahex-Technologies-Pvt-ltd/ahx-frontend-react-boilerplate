@@ -5,4 +5,4 @@ export type {
     AuthProviderProps,
     AuthState,
     AuthUser,
-} from './auth-context/types';
+} from '../types';
