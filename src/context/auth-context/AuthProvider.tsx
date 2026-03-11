@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
 
-import { apiClient } from '../../api';
-import { isApiError, isForbidden, isUnauthorized } from '../../api/utils';
+import { isApiError, isForbidden, isUnauthorized } from '../../api';
+import { authService } from '../../services';
+import type { AuthProviderConfig, AuthProviderProps, AuthState, AuthUser } from '../../types';
 import { buildAuthConfig } from './config';
 import { AuthContext } from './context';
 import { getStoredToken, setStoredToken } from './storage';
-import type { AuthProviderConfig, AuthProviderProps, AuthState, AuthUser } from './types';
 
 
 
@@ -37,18 +37,12 @@ export const AuthProvider = ({ children, config }: AuthProviderProps) => {
         if (!isCookieMode || !resolvedConfig.logoutPath) return;
 
         try {
-            await apiClient.instance.request({
-                method: resolvedConfig.logoutMethod,
-                url: resolvedConfig.logoutPath,
-                withCredentials: resolvedConfig.includeCredentials,
-            });
+            await authService.logout();
         } catch {
             // Keep local logout deterministic even if network logout fails.
         }
     }, [
         isCookieMode,
-        resolvedConfig.includeCredentials,
-        resolvedConfig.logoutMethod,
         resolvedConfig.logoutPath,
     ]);
 
@@ -83,7 +77,6 @@ export const AuthProvider = ({ children, config }: AuthProviderProps) => {
 
     const fetchProfile = useCallback(
         async (
-            activeToken?: string,
             options?: {
                 signal?: AbortSignal;
                 setLoading?: boolean;
@@ -95,23 +88,10 @@ export const AuthProvider = ({ children, config }: AuthProviderProps) => {
             setError(null);
 
             try {
-                const headers: Record<string, string> = {};
-                if (!isCookieMode && activeToken) {
-                    headers[resolvedConfig.authHeaderName] =
-                        `${resolvedConfig.authHeaderPrefix} ${activeToken}`;
-                }
-
-                // apiClient.instance interceptor unwraps the backend envelope;
-                // response.data is the resolved AuthUser on success.
-                const response = await apiClient.instance.get<AuthUser>(resolvedConfig.profilePath, {
-                    headers,
-                    signal: options?.signal,
-                    withCredentials: resolvedConfig.includeCredentials,
-                });
+                const profile = await authService.getProfile();
 
                 if (currentRequestId !== requestIdRef.current) return null;
 
-                const profile = response.data;
                 if (!profile) throw new Error('Profile response data is missing');
 
                 setUser(profile);
@@ -146,14 +126,7 @@ export const AuthProvider = ({ children, config }: AuthProviderProps) => {
                 }
             }
         },
-        [
-            isCookieMode,
-            logout,
-            resolvedConfig.authHeaderName,
-            resolvedConfig.authHeaderPrefix,
-            resolvedConfig.includeCredentials,
-            resolvedConfig.profilePath,
-        ],
+        [logout],
     );
 
     const refreshProfile = useCallback(async (): Promise<AuthUser | null> => {
@@ -163,7 +136,7 @@ export const AuthProvider = ({ children, config }: AuthProviderProps) => {
             return null;
         }
 
-        return fetchProfile(token ?? undefined);
+        return fetchProfile();
     }, [fetchProfile, isCookieMode, token]);
 
     useEffect(() => {
@@ -176,7 +149,7 @@ export const AuthProvider = ({ children, config }: AuthProviderProps) => {
 
         const controller = new AbortController();
 
-        void fetchProfile(token ?? undefined, { signal: controller.signal });
+        void fetchProfile({ signal: controller.signal });
 
         return () => {
             controller.abort();

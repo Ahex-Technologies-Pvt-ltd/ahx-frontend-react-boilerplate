@@ -1,5 +1,5 @@
-import { API_ENDPOINTS } from '../../api/endpoints';
-import type { AuthProviderConfig } from './types';
+import { API_ENDPOINTS } from '../../api';
+import type { AuthProviderConfig } from '../../types';
 
 
 
