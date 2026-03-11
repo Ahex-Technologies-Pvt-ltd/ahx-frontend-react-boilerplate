@@ -1,16 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
 
-import { buildAuthConfig, resolveProfileUrl } from './config';
+import { apiClient } from '../../api';
+import { isApiError, isForbidden, isUnauthorized } from '../../api/utils';
+import { buildAuthConfig } from './config';
 import { AuthContext } from './context';
 import { getStoredToken, setStoredToken } from './storage';
-import type {
-    ApiResponse,
-    AuthProviderConfig,
-    AuthProviderProps,
-    AuthState,
-    AuthUser,
-} from './types';
+import type { AuthProviderConfig, AuthProviderProps, AuthState, AuthUser } from './types';
 
 
 
@@ -38,30 +34,19 @@ export const AuthProvider = ({ children, config }: AuthProviderProps) => {
     }, [isCookieMode, resolvedConfig.tokenStorageKey]);
 
     const clearServerSession = useCallback(async (): Promise<void> => {
-        if (!isCookieMode || !resolvedConfig.logoutPath) {
-            return;
-        }
-
-        const headers: Record<string, string> = {};
-
-        if (resolvedConfig.logoutMethod === 'POST') {
-            headers['Content-Type'] = 'application/json';
-        }
+        if (!isCookieMode || !resolvedConfig.logoutPath) return;
 
         try {
-            await axios.request({
+            await apiClient.instance.request({
                 method: resolvedConfig.logoutMethod,
-                url: resolveProfileUrl(resolvedConfig.apiBaseUrl, resolvedConfig.logoutPath),
-                headers,
+                url: resolvedConfig.logoutPath,
                 withCredentials: resolvedConfig.includeCredentials,
-                validateStatus: () => true,
             });
         } catch {
             // Keep local logout deterministic even if network logout fails.
         }
     }, [
         isCookieMode,
-        resolvedConfig.apiBaseUrl,
         resolvedConfig.includeCredentials,
         resolvedConfig.logoutMethod,
         resolvedConfig.logoutPath,
@@ -96,31 +81,6 @@ export const AuthProvider = ({ children, config }: AuthProviderProps) => {
         [isCookieMode, resolvedConfig.tokenStorageKey],
     );
 
-    const getApiErrorMessage = useCallback((payload?: ApiResponse<AuthUser>): string => {
-        if (!payload) {
-            return 'Unable to fetch profile';
-        }
-
-        const detailMessage = payload.error?.details
-            ?.map((detail) => detail.message)
-            .filter((message): message is string => Boolean(message))
-            .join(', ');
-
-        if (detailMessage) {
-            return detailMessage;
-        }
-
-        if (payload.message) {
-            return payload.message;
-        }
-
-        if (payload.error?.code) {
-            return payload.error.code;
-        }
-
-        return 'Unable to fetch profile';
-    }, []);
-
     const fetchProfile = useCallback(
         async (
             activeToken?: string,
@@ -131,9 +91,7 @@ export const AuthProvider = ({ children, config }: AuthProviderProps) => {
         ): Promise<AuthUser | null> => {
             const currentRequestId = ++requestIdRef.current;
 
-            if (options?.setLoading !== false) {
-                setIsLoading(true);
-            }
+            if (options?.setLoading !== false) setIsLoading(true);
             setError(null);
 
             try {
@@ -143,52 +101,38 @@ export const AuthProvider = ({ children, config }: AuthProviderProps) => {
                         `${resolvedConfig.authHeaderPrefix} ${activeToken}`;
                 }
 
-                const response = await axios.request<ApiResponse<AuthUser>>({
-                    method: 'GET',
-                    url: resolveProfileUrl(resolvedConfig.apiBaseUrl, resolvedConfig.profilePath),
+                // apiClient.instance interceptor unwraps the backend envelope;
+                // response.data is the resolved AuthUser on success.
+                const response = await apiClient.instance.get<AuthUser>(resolvedConfig.profilePath, {
                     headers,
-                    withCredentials: resolvedConfig.includeCredentials,
                     signal: options?.signal,
-                    validateStatus: () => true,
+                    withCredentials: resolvedConfig.includeCredentials,
                 });
 
-                if (currentRequestId !== requestIdRef.current) {
+                if (currentRequestId !== requestIdRef.current) return null;
+
+                const profile = response.data;
+                if (!profile) throw new Error('Profile response data is missing');
+
+                setUser(profile);
+                return profile;
+            } catch (err) {
+                if (axios.isCancel(err) || (err instanceof DOMException && err.name === 'AbortError')) {
                     return null;
                 }
 
-                if (response.status === 401 || response.status === 403) {
+                if (currentRequestId !== requestIdRef.current) return null;
+
+                // 401 / 403 — session no longer valid; force local logout.
+                if (isUnauthorized(err) || isForbidden(err)) {
                     logout();
                     return null;
                 }
 
-                const payload = response.data ?? null;
-
-                if (response.status < 200 || response.status >= 300 || !payload?.success) {
-                    throw new Error(getApiErrorMessage(payload));
-                }
-
-                if (!payload?.data) {
-                    throw new Error('Profile response data is missing');
-                }
-
-                const profile = payload.data;
-                setUser(profile);
-                return profile;
-            } catch (fetchError) {
-                if (axios.isCancel(fetchError)) {
-                    return null;
-                }
-
-                if (
-                    fetchError instanceof DOMException &&
-                    fetchError.name === 'AbortError'
-                ) {
-                    return null;
-                }
-
-                const message =
-                    fetchError instanceof Error
-                        ? fetchError.message
+                const message = isApiError(err)
+                    ? err.message
+                    : err instanceof Error
+                        ? err.message
                         : 'Unable to fetch profile';
                 setError(message);
                 setUser(null);
@@ -203,10 +147,8 @@ export const AuthProvider = ({ children, config }: AuthProviderProps) => {
             }
         },
         [
-            getApiErrorMessage,
             isCookieMode,
             logout,
-            resolvedConfig.apiBaseUrl,
             resolvedConfig.authHeaderName,
             resolvedConfig.authHeaderPrefix,
             resolvedConfig.includeCredentials,

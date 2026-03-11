@@ -36,24 +36,3 @@ export type AuthProviderProps = {
     children: ReactNode;
     config?: Partial<AuthProviderConfig>;
 };
-
-export type ApiErrorDetail = {
-    field?: string;
-    message?: string;
-};
-
-export type ApiError = {
-    code?: string;
-    statusCode?: number;
-    statuscode?: number;
-    details?: ApiErrorDetail[] | null;
-};
-
-export type ApiResponse<TData> = {
-    success: boolean;
-    message?: string;
-    data?: TData;
-    meta?: Record<string, unknown> | null;
-    error?: ApiError;
-    timestamp?: string;
-};

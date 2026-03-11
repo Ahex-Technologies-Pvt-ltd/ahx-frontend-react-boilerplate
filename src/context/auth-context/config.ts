@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from '../../api/endpoints';
 import type { AuthProviderConfig } from './types';
 
 
@@ -28,15 +29,15 @@ const MODE_DEFAULTS: Record<
     cookie: {
         authMode: 'cookie',
         includeCredentials: true,
-        profilePath: '/auth/profile',
-        logoutPath: '/auth/logout',
+        profilePath: API_ENDPOINTS.AUTH.PROFILE,
+        logoutPath: API_ENDPOINTS.AUTH.LOGOUT,
         logoutMethod: 'POST',
     },
     bearer: {
         authMode: 'bearer',
         includeCredentials: false,
-        profilePath: '/auth/profile',
-        logoutPath: '/auth/logout',
+        profilePath: API_ENDPOINTS.AUTH.PROFILE,
+        logoutPath: API_ENDPOINTS.AUTH.LOGOUT,
         logoutMethod: 'POST',
     },
 };
@@ -70,16 +71,16 @@ export const getAppAuthConfig = (authMode: AuthMode): AuthProviderConfig => {
     return buildAuthConfig({ authMode });
 };
 
-export const resolveProfileUrl = (
+export const resolveEndpointUrl = (
     apiBaseUrl: string,
-    profilePath: string,
+    path: string,
 ): string => {
-    if (/^https?:\/\//i.test(profilePath)) {
-        return profilePath;
+    if (/^https?:\/\//i.test(path)) {
+        return path;
     }
 
     const trimmedBase = apiBaseUrl.replace(/\/+$/, '');
-    const normalizedPath = profilePath.startsWith('/') ? profilePath : `/${profilePath}`;
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
 
     return `${trimmedBase}${normalizedPath}`;
 };
