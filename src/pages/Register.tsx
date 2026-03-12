@@ -4,12 +4,19 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { DynamicForm } from '@/components/forms/DynamicForm';
 import { Button } from '@/components/ui/button';
 import { authService } from '@/services';
-import { loginSchema, type LoginFormData } from '@/validations/authValidation';
+import { registerSchema, type RegisterFormData } from '@/validations/authValidation';
 import type { FormFieldConfig } from '@/components/forms/types';
 
 
 
-const loginFields: FormFieldConfig[] = [
+const registerFields: FormFieldConfig[] = [
+    {
+        name: 'name',
+        type: 'input',
+        label: 'Full Name',
+        placeholder: 'John Doe',
+        required: true,
+    },
     {
         name: 'email',
         type: 'email',
@@ -21,27 +28,37 @@ const loginFields: FormFieldConfig[] = [
         name: 'password',
         type: 'password',
         label: 'Password',
-        placeholder: 'Enter your password',
+        placeholder: 'Min 8 characters',
+        description: 'Must contain at least one uppercase letter and one number',
+        required: true,
+    },
+    {
+        name: 'confirmPassword',
+        type: 'password',
+        label: 'Confirm Password',
+        placeholder: 'Re-enter your password',
         required: true,
     },
 ];
 
-const defaultValues: LoginFormData = {
+const defaultValues: RegisterFormData = {
+    name: '',
     email: '',
     password: '',
+    confirmPassword: '',
 };
 
-export default function Login() {
+export default function Register() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [googleLoading, setGoogleLoading] = useState(false);
 
     const handleSubmit = useCallback(
-        async (data: LoginFormData) => {
+        async (data: RegisterFormData) => {
             setIsLoading(true);
             setError(null);
-            await authService.login(data, {
+            await authService.register(data, {
                 onSuccess: () => {
                     navigate('/dashboard');
                 },
@@ -54,9 +71,8 @@ export default function Login() {
         [navigate],
     );
 
-    const handleGoogleLogin = useGoogleLogin({
+    const handleGoogleSignUp = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
-
             setGoogleLoading(true);
             setError(null);
             await authService.googleAuth(
@@ -73,7 +89,7 @@ export default function Login() {
             setGoogleLoading(false);
         },
         onError: () => {
-            setError('Google sign-in failed. Please try again.');
+            setError('Google sign-up failed. Please try again.');
             setGoogleLoading(false);
         },
     });
@@ -84,11 +100,9 @@ export default function Login() {
                 {/* Header */}
                 <div className="text-center">
                     <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-                        Welcome back
+                        Create an account
                     </h1>
-                    <p className="mt-2 text-sm text-gray-600">
-                        Sign in to your account to continue
-                    </p>
+                    <p className="mt-2 text-sm text-gray-600">Sign up to get started today</p>
                 </div>
 
                 {/* Card */}
@@ -100,13 +114,13 @@ export default function Login() {
                         </div>
                     )}
 
-                    {/* Login Form */}
-                    <DynamicForm<LoginFormData>
-                        schema={loginSchema}
+                    {/* Register Form */}
+                    <DynamicForm<RegisterFormData>
+                        schema={registerSchema}
                         defaultValues={defaultValues}
-                        fields={loginFields}
+                        fields={registerFields}
                         onSubmit={handleSubmit}
-                        submitButtonText={isLoading ? 'Signing in...' : 'Sign In'}
+                        submitButtonText={isLoading ? 'Creating account...' : 'Create Account'}
                     />
 
                     {/* Divider */}
@@ -119,12 +133,12 @@ export default function Login() {
                         </div>
                     </div>
 
-                    {/* Google Sign-In */}
+                    {/* Google Sign-Up */}
                     <Button
                         type="button"
                         variant="outline"
                         className="w-full gap-3"
-                        onClick={() => handleGoogleLogin()}
+                        onClick={() => handleGoogleSignUp()}
                         disabled={googleLoading || isLoading}
                     >
                         <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
@@ -145,14 +159,14 @@ export default function Login() {
                                 fill="#EA4335"
                             />
                         </svg>
-                        {googleLoading ? 'Signing in with Google...' : 'Sign in with Google'}
+                        {googleLoading ? 'Signing up with Google...' : 'Sign up with Google'}
                     </Button>
 
-                    {/* Register Link */}
+                    {/* Login Link */}
                     <p className="mt-6 text-center text-sm text-gray-600">
-                        Don&apos;t have an account?{' '}
-                        <Link to="/register" className="font-medium text-primary hover:underline">
-                            Create one
+                        Already have an account?{' '}
+                        <Link to="/login" className="font-medium text-primary hover:underline">
+                            Sign in
                         </Link>
                     </p>
                 </div>
