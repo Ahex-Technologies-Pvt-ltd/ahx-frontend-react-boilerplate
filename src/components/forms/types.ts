@@ -56,6 +56,7 @@ export interface FormFieldConfig {
   multiple?: boolean; // for file input
   rows?: number; // for textarea
   cols?: number; // for textarea
+  isComma?: boolean; // for number input - show comma separated values (currency format)
 }
 
 export interface DynamicFormProps<T> {
@@ -65,4 +66,5 @@ export interface DynamicFormProps<T> {
   onSubmit: (data: T) => void;
   submitButtonText?: string;
   className?: string;
+  validationMode?: 'onSubmit' | 'onChange';  // 'onSubmit': button enabled by default, validate on submit | 'onChange': button disabled by default, validate in real-time
 }

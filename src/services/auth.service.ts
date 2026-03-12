@@ -3,6 +3,10 @@ import type { RequestCallbacks, RequestOptions } from '../api';
 import type {
     LoginPayload,
     LoginResponse,
+    RegisterPayload,
+    RegisterResponse,
+    GoogleAuthPayload,
+    GoogleAuthResponse,
     ForgotPasswordPayload,
     ResetPasswordPayload,
     AuthUser,
@@ -25,6 +29,13 @@ export const authService = {
      */
     login(payload: LoginPayload, callbacks?: RequestCallbacks<LoginResponse>) {
         return apiClient.post<LoginResponse>(AUTH.LOGIN, payload, callbacks);
+    },
+    register(payload: RegisterPayload, callbacks?: RequestCallbacks<RegisterResponse>) {
+        return apiClient.post<RegisterResponse>(AUTH.REGISTER, payload, callbacks);
+    },
+
+    googleAuth(payload: GoogleAuthPayload, callbacks?: RequestCallbacks<GoogleAuthResponse>) {
+        return apiClient.post<GoogleAuthResponse>(AUTH.GOOGLE, payload, callbacks);
     },
 
     /**

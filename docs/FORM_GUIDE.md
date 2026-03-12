@@ -268,3 +268,46 @@ const handleSubmit = (data: FormData) => {
 
 - **README.md** - Quick start and overview
 - **src/pages/AdvancedForm.tsx** - Complete working example
+- **src/pages/ValidationModesExample.tsx** - Two validation modes example
+
+## Validation Modes
+
+The form supports two validation modes via the `validationMode` prop:
+
+### Mode 1: onSubmit (Submit-on-Click)
+```typescript
+<DynamicForm
+  schema={schema}
+  defaultValues={defaultValues}
+  fields={fields}
+  onSubmit={handleSubmit}
+  validationMode="onSubmit"  // Button enabled by default
+/>
+```
+
+**Behavior:**
+- Button is **enabled by default**
+- Validation happens **only on submit**
+- Errors show **after clicking submit**
+- Best for: Quick forms, surveys
+
+### Mode 2: onChange (Real-Time)
+```typescript
+<DynamicForm
+  schema={schema}
+  defaultValues={defaultValues}
+  fields={fields}
+  onSubmit={handleSubmit}
+  validationMode="onChange"  // Button disabled by default
+/>
+```
+
+**Behavior:**
+- Button is **disabled by default**
+- Validation happens **as user types**
+- Errors show **in real-time**
+- Button enables **only when all fields are valid**
+- Best for: Complex forms, sign-up forms
+
+### Default Mode
+If `validationMode` is not specified, it defaults to `'onChange'` (real-time validation).
