@@ -1,11 +1,11 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
 import { DynamicForm } from '@/components/forms/DynamicForm';
 import { Button } from '@/components/ui/button';
-import { authService } from '@/services';
 import { registerSchema, type RegisterFormData } from '@/validations/authValidation';
 import type { FormFieldConfig } from '@/components/forms/types';
+import { useAuth } from '@/context';
 
 
 
@@ -50,47 +50,32 @@ const defaultValues: RegisterFormData = {
 
 export default function Register() {
     const navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [googleLoading, setGoogleLoading] = useState(false);
+    const { register, googleAuth, loading, error, clearError } = useAuth();
 
     const handleSubmit = useCallback(
         async (data: RegisterFormData) => {
-            setIsLoading(true);
-            setError(null);
-            await authService.register(data, {
-                onSuccess: () => {
-                    navigate('/dashboard');
-                },
-                onError: (err) => {
-                    setError(err.message);
-                },
-            });
-            setIsLoading(false);
+            try {
+                await register(data);
+                navigate('/dashboard');
+            } catch {
+                // error is set inside AuthContext
+            }
         },
-        [navigate],
+        [register, navigate],
     );
 
     const handleGoogleSignUp = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
-            setGoogleLoading(true);
-            setError(null);
-            await authService.googleAuth(
-                { token: tokenResponse.access_token },
-                {
-                    onSuccess: () => {
-                        navigate('/dashboard');
-                    },
-                    onError: (err) => {
-                        setError(err.message);
-                    },
-                },
-            );
-            setGoogleLoading(false);
+            clearError();
+            try {
+                await googleAuth({ token: tokenResponse.access_token });
+                navigate('/dashboard');
+            } catch {
+                // error is set inside AuthContext
+            }
         },
         onError: () => {
-            setError('Google sign-up failed. Please try again.');
-            setGoogleLoading(false);
+            // Google popup itself failed — no token received
         },
     });
 
@@ -107,7 +92,7 @@ export default function Register() {
 
                 {/* Card */}
                 <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-                    {/* Server error */}
+                    {/* Error from AuthContext */}
                     {error && (
                         <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                             {error}
@@ -120,7 +105,7 @@ export default function Register() {
                         defaultValues={defaultValues}
                         fields={registerFields}
                         onSubmit={handleSubmit}
-                        submitButtonText={isLoading ? 'Creating account...' : 'Create Account'}
+                        submitButtonText={loading ? 'Creating account...' : 'Create Account'}
                     />
 
                     {/* Divider */}
@@ -139,7 +124,7 @@ export default function Register() {
                         variant="outline"
                         className="w-full gap-3"
                         onClick={() => handleGoogleSignUp()}
-                        disabled={googleLoading || isLoading}
+                        disabled={loading}
                     >
                         <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
                             <path
@@ -159,7 +144,7 @@ export default function Register() {
                                 fill="#EA4335"
                             />
                         </svg>
-                        {googleLoading ? 'Signing up with Google...' : 'Sign up with Google'}
+                        {loading ? 'Please wait...' : 'Sign up with Google'}
                     </Button>
 
                     {/* Login Link */}
