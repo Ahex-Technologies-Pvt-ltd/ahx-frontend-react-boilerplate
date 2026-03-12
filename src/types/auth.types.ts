@@ -78,3 +78,31 @@ export interface AuthProviderProps {
     children: ReactNode
     config?: Partial<AuthProviderConfig>
 }
+
+export interface AuthState {
+    user: AuthUser | null
+    token: string | null
+    isLoading: boolean
+    error: string | null
+    isAuthenticated: boolean
+    setToken: (token: string | null) => void
+    refreshProfile: () => Promise<AuthUser | null>
+    logout: () => void
+}
+
+export interface AuthProviderConfig {
+    authMode: 'cookie' | 'bearer'
+    includeCredentials: boolean
+    apiBaseUrl: string
+    profilePath: string
+    logoutPath: string
+    logoutMethod: 'POST' | 'GET'
+    tokenStorageKey: string
+    authHeaderName: string
+    authHeaderPrefix: string
+}
+
+export interface AuthProviderProps {
+    children: ReactNode
+    config?: Partial<AuthProviderConfig>
+}
