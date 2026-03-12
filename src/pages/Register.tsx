@@ -1,15 +1,22 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
 import { DynamicForm } from '@/components/forms/DynamicForm';
 import { Button } from '@/components/ui/button';
-import { authService } from '@/services';
-import { loginSchema, type LoginFormData } from '@/validations/authValidation';
+import { registerSchema, type RegisterFormData } from '@/validations/authValidation';
 import type { FormFieldConfig } from '@/components/forms/types';
+import { useAuth } from '@/context';
 
 
 
-const loginFields: FormFieldConfig[] = [
+const registerFields: FormFieldConfig[] = [
+    {
+        name: 'name',
+        type: 'input',
+        label: 'Full Name',
+        placeholder: 'John Doe',
+        required: true,
+    },
     {
         name: 'email',
         type: 'email',
@@ -21,60 +28,54 @@ const loginFields: FormFieldConfig[] = [
         name: 'password',
         type: 'password',
         label: 'Password',
-        placeholder: 'Enter your password',
+        placeholder: 'Min 8 characters',
+        description: 'Must contain at least one uppercase letter and one number',
+        required: true,
+    },
+    {
+        name: 'confirmPassword',
+        type: 'password',
+        label: 'Confirm Password',
+        placeholder: 'Re-enter your password',
         required: true,
     },
 ];
 
-const defaultValues: LoginFormData = {
+const defaultValues: RegisterFormData = {
+    name: '',
     email: '',
     password: '',
+    confirmPassword: '',
 };
 
-export default function Login() {
+export default function Register() {
     const navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [googleLoading, setGoogleLoading] = useState(false);
+    const { register, googleAuth, isLoading, error, clearError } = useAuth();
 
     const handleSubmit = useCallback(
-        async (data: LoginFormData) => {
-            setIsLoading(true);
-            setError(null);
-            await authService.login(data, {
-                onSuccess: () => {
-                    navigate('/dashboard');
-                },
-                onError: (err) => {
-                    setError(err.message);
-                },
-            });
-            setIsLoading(false);
+        async (data: RegisterFormData) => {
+            try {
+                await register(data);
+                navigate('/dashboard');
+            } catch {
+                // error is set inside AuthContext
+            }
         },
-        [navigate],
+        [register, navigate],
     );
 
-    const handleGoogleLogin = useGoogleLogin({
+    const handleGoogleSignUp = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
-
-            setGoogleLoading(true);
-            setError(null);
-            await authService.googleAuth(
-                { token: tokenResponse.access_token },
-                {
-                    onSuccess: () => {
-                        navigate('/dashboard');
-                    },
-                    onError: (err) => {
-                        setError(err.message);
-                    },
-                },
-            );
-            setGoogleLoading(false);
+            clearError();
+            try {
+                await googleAuth({ token: tokenResponse.access_token });
+                navigate('/dashboard');
+            } catch {
+                // error is set inside AuthContext
+            }
         },
         onError: () => {
-            setError('Google sign-in failed. Please try again.');
-            setGoogleLoading(false);
+            // Google popup itself failed — no token received
         },
     });
 
@@ -84,29 +85,27 @@ export default function Login() {
                 {/* Header */}
                 <div className="text-center">
                     <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-                        Welcome back
+                        Create an account
                     </h1>
-                    <p className="mt-2 text-sm text-gray-600">
-                        Sign in to your account to continue
-                    </p>
+                    <p className="mt-2 text-sm text-gray-600">Sign up to get started today</p>
                 </div>
 
                 {/* Card */}
                 <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-                    {/* Server error */}
+                    {/* Error from AuthContext */}
                     {error && (
                         <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                             {error}
                         </div>
                     )}
 
-                    {/* Login Form */}
-                    <DynamicForm<LoginFormData>
-                        schema={loginSchema}
+                    {/* Register Form */}
+                    <DynamicForm<RegisterFormData>
+                        schema={registerSchema}
                         defaultValues={defaultValues}
-                        fields={loginFields}
+                        fields={registerFields}
                         onSubmit={handleSubmit}
-                        submitButtonText={isLoading ? 'Signing in...' : 'Sign In'}
+                        submitButtonText={isLoading ? 'Creating account...' : 'Create Account'}
                     />
 
                     {/* Divider */}
@@ -119,13 +118,13 @@ export default function Login() {
                         </div>
                     </div>
 
-                    {/* Google Sign-In */}
+                    {/* Google Sign-Up */}
                     <Button
                         type="button"
                         variant="outline"
                         className="w-full gap-3"
-                        onClick={() => handleGoogleLogin()}
-                        disabled={googleLoading || isLoading}
+                        onClick={() => handleGoogleSignUp()}
+                        disabled={isLoading}
                     >
                         <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
                             <path
@@ -145,14 +144,14 @@ export default function Login() {
                                 fill="#EA4335"
                             />
                         </svg>
-                        {googleLoading ? 'Signing in with Google...' : 'Sign in with Google'}
+                        {isLoading ? 'Please wait...' : 'Sign up with Google'}
                     </Button>
 
-                    {/* Register Link */}
+                    {/* Login Link */}
                     <p className="mt-6 text-center text-sm text-gray-600">
-                        Don&apos;t have an account?{' '}
-                        <Link to="/register" className="font-medium text-primary hover:underline">
-                            Create one
+                        Already have an account?{' '}
+                        <Link to="/login" className="font-medium text-primary hover:underline">
+                            Sign in
                         </Link>
                     </p>
                 </div>

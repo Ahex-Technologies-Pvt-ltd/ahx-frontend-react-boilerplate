@@ -1,11 +1,11 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
 import { DynamicForm } from '@/components/forms/DynamicForm';
 import { Button } from '@/components/ui/button';
-import { authService } from '@/services';
 import { loginSchema, type LoginFormData } from '@/validations/authValidation';
 import type { FormFieldConfig } from '@/components/forms/types';
+import { useAuth } from '@/context';
 
 
 
@@ -33,48 +33,32 @@ const defaultValues: LoginFormData = {
 
 export default function Login() {
     const navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [googleLoading, setGoogleLoading] = useState(false);
+    const { login, googleAuth, isLoading, error, clearError } = useAuth();
 
     const handleSubmit = useCallback(
         async (data: LoginFormData) => {
-            setIsLoading(true);
-            setError(null);
-            await authService.login(data, {
-                onSuccess: () => {
-                    navigate('/dashboard');
-                },
-                onError: (err) => {
-                    setError(err.message);
-                },
-            });
-            setIsLoading(false);
+            try {
+                await login(data);
+                navigate('/dashboard');
+            } catch {
+                // error is set inside AuthContext
+            }
         },
-        [navigate],
+        [login, navigate],
     );
 
     const handleGoogleLogin = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
-
-            setGoogleLoading(true);
-            setError(null);
-            await authService.googleAuth(
-                { token: tokenResponse.access_token },
-                {
-                    onSuccess: () => {
-                        navigate('/dashboard');
-                    },
-                    onError: (err) => {
-                        setError(err.message);
-                    },
-                },
-            );
-            setGoogleLoading(false);
+            clearError();
+            try {
+                await googleAuth({ token: tokenResponse.access_token });
+                navigate('/dashboard');
+            } catch {
+                // error is set inside AuthContext
+            }
         },
         onError: () => {
-            setError('Google sign-in failed. Please try again.');
-            setGoogleLoading(false);
+            // Google popup itself failed — no token received
         },
     });
 
@@ -93,7 +77,7 @@ export default function Login() {
 
                 {/* Card */}
                 <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-                    {/* Server error */}
+                    {/* Error from AuthContext */}
                     {error && (
                         <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                             {error}
@@ -125,7 +109,7 @@ export default function Login() {
                         variant="outline"
                         className="w-full gap-3"
                         onClick={() => handleGoogleLogin()}
-                        disabled={googleLoading || isLoading}
+                        disabled={isLoading}
                     >
                         <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
                             <path
@@ -145,7 +129,7 @@ export default function Login() {
                                 fill="#EA4335"
                             />
                         </svg>
-                        {googleLoading ? 'Signing in with Google...' : 'Sign in with Google'}
+                        {isLoading ? 'Please wait...' : 'Sign in with Google'}
                     </Button>
 
                     {/* Register Link */}

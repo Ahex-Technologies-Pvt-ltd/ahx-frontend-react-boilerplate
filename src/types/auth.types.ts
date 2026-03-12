@@ -1,8 +1,3 @@
-import type { ReactNode } from 'react';
-
-
-
-
 export interface LoginPayload {
     email: string
     password: string
@@ -51,58 +46,27 @@ export interface GoogleAuthResponse {
     token: string
 }
 
-export interface AuthState {
+
+
+
+
+
+
+
+
+
+
+
+export interface AuthContextValue {
     user: AuthUser | null
-    token: string | null
+    loading: boolean
     isLoading: boolean
-    error: string | null
     isAuthenticated: boolean
-    setToken: (token: string | null) => void
-    refreshProfile: () => Promise<AuthUser | null>
-    logout: () => void
-}
-
-export interface AuthProviderConfig {
-    authMode: 'cookie' | 'bearer'
-    includeCredentials: boolean
-    apiBaseUrl: string
-    profilePath: string
-    logoutPath: string
-    logoutMethod: 'POST' | 'GET'
-    tokenStorageKey: string
-    authHeaderName: string
-    authHeaderPrefix: string
-}
-
-export interface AuthProviderProps {
-    children: ReactNode
-    config?: Partial<AuthProviderConfig>
-}
-
-export interface AuthState {
-    user: AuthUser | null
-    token: string | null
-    isLoading: boolean
     error: string | null
-    isAuthenticated: boolean
-    setToken: (token: string | null) => void
-    refreshProfile: () => Promise<AuthUser | null>
-    logout: () => void
-}
-
-export interface AuthProviderConfig {
-    authMode: 'cookie' | 'bearer'
-    includeCredentials: boolean
-    apiBaseUrl: string
-    profilePath: string
-    logoutPath: string
-    logoutMethod: 'POST' | 'GET'
-    tokenStorageKey: string
-    authHeaderName: string
-    authHeaderPrefix: string
-}
-
-export interface AuthProviderProps {
-    children: ReactNode
-    config?: Partial<AuthProviderConfig>
+    clearError: () => void
+    login: (payload: LoginPayload) => Promise<void>  
+    register: (payload: RegisterPayload) => Promise<void>  
+    googleAuth: (payload: GoogleAuthPayload) => Promise<void>
+    logout: () => Promise<void>
+    refetchUser: () => Promise<void>
 }
