@@ -16,17 +16,26 @@ export function DynamicForm<T extends FieldValues>({
     onSubmit,
     submitButtonText = "Submit",
     className,
+    validationMode = 'onSubmit',
 }: DynamicFormProps<T>) {
     const form = useForm({
         resolver: zodResolver(schema as any),
         defaultValues: defaultValues as any,
-        mode: "onChange", // Enable real-time validation
-        reValidateMode: "onChange", // Revalidate on every change
+        mode: validationMode === 'onSubmit' ? 'onSubmit' : 'onChange',
+        reValidateMode: validationMode === 'onSubmit' ? 'onSubmit' : 'onChange',
     });
 
     // Watch all form fields and formState to trigger re-render
     const isFormValid = form.formState.isValid;
     const isSubmitting = form.formState.isSubmitting;
+
+    // Button logic based on validation mode:
+    // Mode 1 (onSubmit): Button enabled by default, only disabled while submitting
+    // Mode 2 (onChange): Button disabled by default, enabled only when form is valid
+    const isButtonDisabled = 
+        validationMode === 'onSubmit' 
+            ? isSubmitting 
+            : !isFormValid || isSubmitting;
 
     const handleSubmit = form.handleSubmit((data) => {
         onSubmit(data);
@@ -45,7 +54,7 @@ export function DynamicForm<T extends FieldValues>({
                 <Button 
                     type="submit" 
                     className="w-full"
-                    disabled={!isFormValid || isSubmitting}
+                    disabled={isButtonDisabled}
                 >
                     {submitButtonText}
                 </Button>
