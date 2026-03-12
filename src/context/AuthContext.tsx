@@ -8,32 +8,28 @@ import { AuthContext } from './authContext';
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [loading, setLoading] = useState(true);
-    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const clearError = useCallback(() => setError(null), []);
 
     const refetchUser = useCallback(async () => {
+        setLoading(true);
         try {
             const userData = await authService.getProfile();
             setUser(userData);
         } catch {
             setUser(null);
+        } finally {
+            setLoading(false);
         }
     }, []);
 
     useEffect(() => {
-        const initAuth = async () => {
-            setLoading(true);
-            await refetchUser();
-            setLoading(false);
-        };
-
-        initAuth();
+        refetchUser();
     }, [refetchUser]);
 
     const login = useCallback(async (payload: LoginPayload) => {
-        setIsLoading(true);
+        setLoading(true);
         setError(null);
         try {
             const data = await authService.login(payload);
@@ -43,12 +39,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setError(message);
             throw err;
         } finally {
-            setIsLoading(false);
+            setLoading(false);
         }
     }, []);
 
     const register = useCallback(async (payload: RegisterPayload) => {
-        setIsLoading(true);
+        setLoading(true);
         setError(null);
         try {
             const data = await authService.register(payload);
@@ -59,12 +55,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setError(message);
             throw err;
         } finally {
-            setIsLoading(false);
+            setLoading(false);
         }
     }, []);
 
     const googleAuth = useCallback(async (payload: GoogleAuthPayload) => {
-        setIsLoading(true);
+        setLoading(true);
         setError(null);
         try {
             const data = await authService.googleAuth(payload);
@@ -75,18 +71,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setError(message);
             throw err;
         } finally {
-            setIsLoading(false);
+            setLoading(false);
         }
     }, []);
 
     const logout = useCallback(async () => {
-        setIsLoading(true);
+        setLoading(true);
         setError(null);
         try {
             await authService.logout();
             await refetchUser();
         } finally {
-            setIsLoading(false);
+            setLoading(false);
         }
     }, [refetchUser]);
 
@@ -95,7 +91,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             value={{
                 user,
                 loading,
-                isLoading,
                 isAuthenticated: !!user,
                 error,
                 clearError,

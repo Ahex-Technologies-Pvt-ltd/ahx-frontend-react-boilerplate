@@ -33,7 +33,7 @@ const defaultValues: LoginFormData = {
 
 export default function Login() {
     const navigate = useNavigate();
-    const { login, googleAuth, isLoading, error, clearError } = useAuth();
+    const { login, googleAuth, loading, error, clearError } = useAuth();
 
     const handleSubmit = useCallback(
         async (data: LoginFormData) => {
@@ -90,7 +90,7 @@ export default function Login() {
                         defaultValues={defaultValues}
                         fields={loginFields}
                         onSubmit={handleSubmit}
-                        submitButtonText={isLoading ? 'Signing in...' : 'Sign In'}
+                        submitButtonText={loading ? 'Signing in...' : 'Sign In'}
                     />
 
                     {/* Divider */}
@@ -109,7 +109,7 @@ export default function Login() {
                         variant="outline"
                         className="w-full gap-3"
                         onClick={() => handleGoogleLogin()}
-                        disabled={isLoading}
+                        disabled={loading}
                     >
                         <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
                             <path
@@ -129,7 +129,7 @@ export default function Login() {
                                 fill="#EA4335"
                             />
                         </svg>
-                        {isLoading ? 'Please wait...' : 'Sign in with Google'}
+                        {loading ? 'Please wait...' : 'Sign in with Google'}
                     </Button>
 
                     {/* Register Link */}

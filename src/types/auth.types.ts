@@ -46,21 +46,9 @@ export interface GoogleAuthResponse {
     token: string
 }
 
-
-
-
-
-
-
-
-
-
-
-
 export interface AuthContextValue {
     user: AuthUser | null
     loading: boolean
-    isLoading: boolean
     isAuthenticated: boolean
     error: string | null
     clearError: () => void

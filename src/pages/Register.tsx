@@ -50,7 +50,7 @@ const defaultValues: RegisterFormData = {
 
 export default function Register() {
     const navigate = useNavigate();
-    const { register, googleAuth, isLoading, error, clearError } = useAuth();
+    const { register, googleAuth, loading, error, clearError } = useAuth();
 
     const handleSubmit = useCallback(
         async (data: RegisterFormData) => {
@@ -105,7 +105,7 @@ export default function Register() {
                         defaultValues={defaultValues}
                         fields={registerFields}
                         onSubmit={handleSubmit}
-                        submitButtonText={isLoading ? 'Creating account...' : 'Create Account'}
+                        submitButtonText={loading ? 'Creating account...' : 'Create Account'}
                     />
 
                     {/* Divider */}
@@ -124,7 +124,7 @@ export default function Register() {
                         variant="outline"
                         className="w-full gap-3"
                         onClick={() => handleGoogleSignUp()}
-                        disabled={isLoading}
+                        disabled={loading}
                     >
                         <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
                             <path
@@ -144,7 +144,7 @@ export default function Register() {
                                 fill="#EA4335"
                             />
                         </svg>
-                        {isLoading ? 'Please wait...' : 'Sign up with Google'}
+                        {loading ? 'Please wait...' : 'Sign up with Google'}
                     </Button>
 
                     {/* Login Link */}
