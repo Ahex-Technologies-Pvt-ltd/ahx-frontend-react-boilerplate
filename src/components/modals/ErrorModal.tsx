@@ -1,11 +1,11 @@
 import React from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, XCircle } from "lucide-react";
@@ -74,73 +74,73 @@ export interface ErrorModalProps {
  * />
  */
 const ErrorModal: React.FC<ErrorModalProps> = ({
-  isOpen,
-  onClose,
-  title = "An Error Occurred",
-  message = "Something went wrong. Please try again later.",
-  errorCode,
-  showCloseButton = true,
-  closeButtonText = "Close",
-  variant = "error",
+    isOpen,
+    onClose,
+    title = "An Error Occurred",
+    message = "Something went wrong. Please try again later.",
+    errorCode,
+    showCloseButton = true,
+    closeButtonText = "Close",
+    variant = "error",
 }) => {
-  const iconColor = variant === "error" ? "text-destructive" : "text-amber-500";
-  const bgColor = variant === "error" ? "bg-destructive/10" : "bg-amber-50";
-  const borderColor = variant === "error" ? "border-destructive/20" : "border-amber-200";
+    const iconColor = variant === "error" ? "text-destructive" : "text-amber-500";
+    const bgColor = variant === "error" ? "bg-destructive/10" : "bg-amber-50";
+    const borderColor = variant === "error" ? "border-destructive/20" : "border-amber-200";
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent
-        className={cn(
-          "sm:max-w-md",
-          "border-2",
-          borderColor
-        )}
-        onInteractOutside={(e) => e.preventDefault()}
-        onEscapeKeyDown={onClose}
-      >
-        <DialogHeader>
-          <div className="flex items-start gap-4">
-            <div className={cn("rounded-full p-3", bgColor)}>
-              {variant === "error" ? (
-                <XCircle className={cn("h-6 w-6", iconColor)} />
-              ) : (
-                <AlertCircle className={cn("h-6 w-6", iconColor)} />
-              )}
-            </div>
-            <div className="flex-1">
-              <DialogTitle className="text-left">{title}</DialogTitle>
-              {errorCode && (
-                <div className="mt-1">
-                  <span className="text-xs font-mono bg-muted px-2 py-1 rounded">
-                    Error Code: {errorCode}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-        </DialogHeader>
-        
-        <DialogDescription className="text-left pt-2 px-1">
-          <div className="whitespace-pre-wrap break-words">
-            {message}
-          </div>
-        </DialogDescription>
-
-        {showCloseButton && (
-          <DialogFooter>
-            <Button
-              type="button"
-              variant={variant === "error" ? "destructive" : "outline"}
-              onClick={onClose}
-              className="w-full sm:w-auto"
+    return (
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent
+                className={cn(
+                    "sm:max-w-md",
+                    "border-2",
+                    borderColor
+                )}
+                onInteractOutside={(e) => e.preventDefault()}
+                onEscapeKeyDown={onClose}
             >
-              {closeButtonText}
-            </Button>
-          </DialogFooter>
-        )}
-      </DialogContent>
-    </Dialog>
-  );
+                <DialogHeader>
+                    <div className="flex items-start gap-4">
+                        <div className={cn("rounded-full p-3", bgColor)}>
+                            {variant === "error" ? (
+                                <XCircle className={cn("h-6 w-6", iconColor)} />
+                            ) : (
+                                <AlertCircle className={cn("h-6 w-6", iconColor)} />
+                            )}
+                        </div>
+                        <div className="flex-1">
+                            <DialogTitle className="text-left">{title}</DialogTitle>
+                            {errorCode && (
+                                <div className="mt-1">
+                                    <span className="text-xs font-mono bg-muted px-2 py-1 rounded">
+                    Error Code: {errorCode}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </DialogHeader>
+        
+                <DialogDescription className="text-left pt-2 px-1">
+                    <div className="whitespace-pre-wrap break-words">
+                        {message}
+                    </div>
+                </DialogDescription>
+
+                {showCloseButton && (
+                    <DialogFooter>
+                        <Button
+                            type="button"
+                            variant={variant === "error" ? "destructive" : "outline"}
+                            onClick={onClose}
+                            className="w-full sm:w-auto"
+                        >
+                            {closeButtonText}
+                        </Button>
+                    </DialogFooter>
+                )}
+            </DialogContent>
+        </Dialog>
+    );
 };
 
 export default ErrorModal;

@@ -1,11 +1,11 @@
 import React from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -102,88 +102,88 @@ export interface DataModalProps {
  * </DataModal>
  */
 const DataModal: React.FC<DataModalProps> = ({
-  isOpen,
-  onClose,
-  title = "Details",
-  description,
-  children,
-  showCloseButton = true,
-  closeButtonText = "Close",
-  showHeader = true,
-  size = "md",
-  scrollable = true,
-  showFooter = true,
+    isOpen,
+    onClose,
+    title = "Details",
+    description,
+    children,
+    showCloseButton = true,
+    closeButtonText = "Close",
+    showHeader = true,
+    size = "md",
+    scrollable = true,
+    showFooter = true,
 }) => {
-  const sizeClasses = {
-    sm: "sm:max-w-sm",
-    md: "sm:max-w-md",
-    lg: "sm:max-w-lg",
-    xl: "sm:max-w-xl",
-    full: "sm:max-w-[90vw]",
-  };
+    const sizeClasses = {
+        sm: "sm:max-w-sm",
+        md: "sm:max-w-md",
+        lg: "sm:max-w-lg",
+        xl: "sm:max-w-xl",
+        full: "sm:max-w-[90vw]",
+    };
 
-  const contentClasses = cn(
-    sizeClasses[size],
-    scrollable && "max-h-[80vh] flex flex-col"
-  );
+    const contentClasses = cn(
+        sizeClasses[size],
+        scrollable && "max-h-[80vh] flex flex-col"
+    );
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent
-        className={contentClasses}
-        onInteractOutside={(e) => e.preventDefault()}
-        onEscapeKeyDown={onClose}
-      >
-        {showHeader && (
-          <DialogHeader className="flex-shrink-0">
-            <div className="flex items-center justify-between">
-              <div>
-                <DialogTitle className="text-left">{title}</DialogTitle>
-                {description && (
-                  <DialogDescription className="text-left pt-1">
-                    {description}
-                  </DialogDescription>
-                )}
-              </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={onClose}
-                className="h-8 w-8 p-0"
-              >
-                <X className="h-4 w-4" />
-                <span className="sr-only">Close</span>
-              </Button>
-            </div>
-          </DialogHeader>
-        )}
-
-        <div
-          className={cn(
-            "flex-1",
-            scrollable && "overflow-y-auto",
-            !showHeader && "pt-6"
-          )}
-        >
-          {children}
-        </div>
-
-        {showFooter && showCloseButton && (
-          <DialogFooter className="flex-shrink-0 pt-4 border-t">
-            <Button 
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="w-full sm:w-auto"
+    return (
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent
+                className={contentClasses}
+                onInteractOutside={(e) => e.preventDefault()}
+                onEscapeKeyDown={onClose}
             >
-              {closeButtonText}
-            </Button>
-          </DialogFooter>
-        )}
-      </DialogContent>
-    </Dialog>
-  );
+                {showHeader && (
+                    <DialogHeader className="flex-shrink-0">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <DialogTitle className="text-left">{title}</DialogTitle>
+                                {description && (
+                                    <DialogDescription className="text-left pt-1">
+                                        {description}
+                                    </DialogDescription>
+                                )}
+                            </div>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={onClose}
+                                className="h-8 w-8 p-0"
+                            >
+                                <X className="h-4 w-4" />
+                                <span className="sr-only">Close</span>
+                            </Button>
+                        </div>
+                    </DialogHeader>
+                )}
+
+                <div
+                    className={cn(
+                        "flex-1",
+                        scrollable && "overflow-y-auto",
+                        !showHeader && "pt-6"
+                    )}
+                >
+                    {children}
+                </div>
+
+                {showFooter && showCloseButton && (
+                    <DialogFooter className="flex-shrink-0 pt-4 border-t">
+                        <Button 
+                            type="button"
+                            variant="outline"
+                            onClick={onClose}
+                            className="w-full sm:w-auto"
+                        >
+                            {closeButtonText}
+                        </Button>
+                    </DialogFooter>
+                )}
+            </DialogContent>
+        </Dialog>
+    );
 };
 
 export default DataModal;
