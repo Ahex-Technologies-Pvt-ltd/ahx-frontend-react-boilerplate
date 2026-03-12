@@ -1,19 +1,35 @@
-# React + TypeScript + Vite
+# React + Vite + TypeScript Boilerplate
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A production-ready React boilerplate with essential components, error handling, and routing system. Built with TypeScript, Tailwind CSS, and modern best practices.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 🎯 Core Stack
+- **React 19** - Latest React with concurrent features
+- **Vite** - Fast build tool and development server
+- **TypeScript** - Full type safety
+- **Tailwind CSS** - Utility-first CSS framework
+- **shadcn/ui** - Reusable component library
 
-## React Compiler
+### 🎨 UI Components
+- **Modal Components** - Reusable, accessible modal dialogs
+- **Error Handling** - Comprehensive error boundaries and pages
+- **Routing System** - Complete routing with error pages
+- **Form Components** - Ready-to-use form elements
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+### 🛡️ Error Handling
+- **Global Error Boundary** - Catches React render errors
+- **Error Pages** - 404 (Not Found) and 403 (Forbidden) pages
+- **Error Modals** - API/runtime error display
+- **Router Error Handling** - Route-level error boundaries
 
-## Expanding the ESLint configuration
+### 🧭 Routing
+- **React Router v6** - Modern routing solution
+- **Nested Routes** - Organized route structure
+- **Catch-all 404** - Handles undefined routes
+- **Protected Routes** - Pattern for authentication
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 📦 Installation
 
 ```js
 export default defineConfig([
@@ -208,4 +224,309 @@ export default defineConfig([
         },
     },
 ])
+```bash
+# Clone the repository
+git clone <repository-url>
+cd react-boilerplate
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Run tests
+npm test
+
+# Lint code
+npm run lint
 ```
+
+## 🏗️ Project Structure
+
+```
+src/
+├── components/           # Reusable components
+│   ├── modals/          # Modal components
+│   │   ├── ConfirmModal.tsx  # Confirmation dialogs
+│   │   ├── ErrorModal.tsx    # Error display modals
+│   │   ├── DataModal.tsx     # Scrollable data modals
+│   │   └── index.ts     # Barrel exports
+│   ├── ui/              # UI components (shadcn)
+│   └── ErrorBoundary.tsx # Global error boundary
+├── pages/               # Page components
+│   ├── NotFound.tsx     # 404 page
+│   ├── Forbidden.tsx    # 403 page
+│   ├── Login.tsx        # Login page
+│   └── ErrorFallback.tsx # Error fallback UI
+├── router/              # Routing configuration
+│   └── index.tsx        # Router setup
+├── lib/                 # Utilities
+│   └── utils.ts         # Utility functions
+├── App.tsx              # Main application
+└── main.tsx             # Application entry point
+```
+
+## 🎯 Component Usage
+
+### Modal Components
+
+#### ConfirmModal
+```tsx
+import { ConfirmModal } from '@/components';
+
+const Example = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <ConfirmModal
+      isOpen={isOpen}
+      onClose={() => setIsOpen(false)}
+      onConfirm={() => console.log('Confirmed')}
+      title="Confirm Action"
+      message="Are you sure you want to proceed?"
+      confirmText="Yes, proceed"
+      cancelText="No, cancel"
+      variant="danger" // default, danger, success, info
+      isLoading={false}
+    />
+  );
+};
+```
+
+#### ErrorModal
+```tsx
+import { ErrorModal } from '@/components';
+
+const Example = () => {
+  return (
+    <ErrorModal
+      isOpen={isOpen}
+      onClose={() => setIsOpen(false)}
+      title="API Error"
+      message="Failed to fetch data from server."
+      errorCode={500}
+      variant="error" // error or warning
+      closeButtonText="Retry"
+    />
+  );
+};
+```
+
+#### DataModal
+```tsx
+import { DataModal } from '@/components';
+
+const Example = () => {
+  return (
+    <DataModal
+      isOpen={isOpen}
+      onClose={() => setIsOpen(false)}
+      title="User Details"
+      description="Detailed user information"
+      size="lg" // sm, md, lg, xl, full
+      scrollable={true}
+    >
+      <div>Custom content here</div>
+    </DataModal>
+  );
+};
+```
+
+### Error Boundary
+```tsx
+// Wrap your entire app in main.tsx
+import ErrorBoundary from '@/components/ErrorBoundary';
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <ErrorBoundary>
+      <AppRouter />
+    </ErrorBoundary>
+  </StrictMode>,
+);
+```
+
+### Custom Error Boundary Usage
+```tsx
+import ErrorBoundary from '@/components/ErrorBoundary';
+
+const Example = () => {
+  return (
+    <ErrorBoundary
+      onError={(error, info) => {
+        // Log to error reporting service
+        console.error('Error:', error, info);
+      }}
+      onReset={() => {
+        // Handle reset logic
+        console.log('Error boundary reset');
+      }}
+      resetKeys={[someState]} // Reset when this changes
+    >
+      <ErrorProneComponent />
+    </ErrorBoundary>
+  );
+};
+```
+
+## 🚦 Routing
+
+### Router Configuration
+The router is configured in `src/router/index.tsx` with:
+- Main application route (`/`)
+- Login route (`/login`)
+- Error pages (`/forbidden`, `*` for 404)
+- Error boundary for route errors
+
+### Adding New Routes
+```tsx
+// In src/router/index.tsx
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    errorElement: <RouterError />,
+    children: [
+      {
+        path: "dashboard",
+        element: <Dashboard />,
+      },
+      {
+        path: "settings",
+        element: <Settings />,
+      },
+    ],
+  },
+  // ... other routes
+]);
+```
+
+## 🎨 Styling
+
+### Tailwind CSS
+This project uses Tailwind CSS for styling. Configuration is in `tailwind.config.ts`.
+
+### Custom Utilities
+The `cn` utility function combines `clsx` and `twMerge` for conditional class names:
+
+```tsx
+import { cn } from '@/lib/utils';
+
+const Example = () => {
+  return (
+    <div className={cn(
+      'base-class',
+      isActive && 'active-class',
+      isError && 'error-class'
+    )}>
+      Content
+    </div>
+  );
+};
+```
+
+## 🔧 Configuration
+
+### TypeScript
+- Configuration: `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json`
+- Strict mode enabled
+- Path aliases configured (`@/*` → `src/*`)
+
+### Vite
+- Configuration: `vite.config.ts`
+- React plugin with SWC
+- Path aliases
+- Environment variables
+
+### ESLint & Prettier
+- Code quality enforcement
+- Auto-formatting on save
+- TypeScript support
+- Tailwind CSS plugin
+
+## 📚 Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Lint code
+- `npm run lint:fix` - Auto-fix lint issues
+- `npm test` - Run tests
+- `npm run test:watch` - Run tests in watch mode
+- `npm run test:coverage` - Generate test coverage
+
+## 🧪 Testing
+
+The project is set up for testing with:
+- Jest testing framework
+- React Testing Library
+- TypeScript support
+- Coverage reporting
+
+## 📦 Dependencies
+
+### Core
+- `react` & `react-dom` - React library
+- `typescript` - TypeScript support
+- `vite` - Build tool
+
+### UI & Styling
+- `tailwindcss` - CSS framework
+- `shadcn-ui` - Component library
+- `lucide-react` - Icon library
+- `clsx` & `tailwind-merge` - Class utilities
+
+### Routing & State
+- `react-router-dom` - Routing
+- `react-error-boundary` - Error handling
+
+### Development
+- `eslint` - Code linting
+- `prettier` - Code formatting
+- `jest` - Testing
+- `@testing-library/react` - React testing
+
+## 🚀 Deployment
+
+### Building for Production
+```bash
+npm run build
+```
+
+The build output will be in the `dist/` directory, ready for deployment to any static hosting service.
+
+### Environment Variables
+Create a `.env` file for environment-specific configuration:
+
+```env
+VITE_API_URL=https://api.example.com
+VITE_APP_NAME=My App
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and linting
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+- [Vite](https://vitejs.dev/) for the excellent build tool
+- [Tailwind CSS](https://tailwindcss.com/) for the CSS framework
+- [shadcn/ui](https://ui.shadcn.com/) for the component library
+- [React Router](https://reactrouter.com/) for routing
+- [React Error Boundary](https://github.com/bvaughn/react-error-boundary) for error handling
+
+---
+
+Built with ❤️ for the React community
