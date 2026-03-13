@@ -1,43 +1,53 @@
-type SpinnerSize = "sm" | "md" | "lg";
+type SpinnerSize = "sm" | "md" | "lg"
+type SpinnerVariant = "inline" | "overlay" | "fullscreen"
 
 interface SpinnerProps {
-  size?: SpinnerSize;
-  color?: string;
-  overlay?: boolean;
-  className?: string;
+  size?: SpinnerSize
+  color?: string
+  variant?: SpinnerVariant
+  center?: boolean
+  className?: string
 }
 
 const Spinner = ({
     size = "md",
     color = "#2563eb",
-    overlay = false,
+    variant = "inline",
+    center = false,
     className = "",
 }: SpinnerProps) => {
-    const spinnerElement = (
+    const spinner = (
         <svg
             className={`spinner spinner-${size} ${className}`}
             viewBox="0 0 50 50"
             style={{ color }}
             role="status"
-            aria-label="loading"
         >
             <circle
-                className="spinner-path"
                 cx="25"
                 cy="25"
                 r="20"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="4"
+                className="spinner-path"
             />
         </svg>
     );
 
-    if (overlay) {
-        return <div className="spinner-overlay">{spinnerElement}</div>;
+    if (variant === "fullscreen") {
+        return <div className="spinner-fullscreen">{spinner}</div>;
     }
 
-    return spinnerElement;
+    if (variant === "overlay") {
+        return <div className="spinner-overlay">{spinner}</div>;
+    }
+
+    if (center) {
+        return <div className="spinner-center">{spinner}</div>;
+    }
+
+    return spinner;
 };
 
 export default Spinner;
