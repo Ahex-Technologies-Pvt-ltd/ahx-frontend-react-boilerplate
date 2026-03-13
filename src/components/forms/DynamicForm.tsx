@@ -22,7 +22,7 @@ export function DynamicForm<T extends FieldValues>({
         resolver: zodResolver(schema as any),
         defaultValues: defaultValues as any,
         mode: validationMode === 'onSubmit' ? 'onSubmit' : 'onChange',
-        reValidateMode: validationMode === 'onSubmit' ? 'onSubmit' : 'onChange',
+        reValidateMode: 'onChange', // Always re-validate on change to clear errors dynamically
     });
 
     // Watch all form fields and formState to trigger re-render

@@ -29,7 +29,7 @@ const registerFields: FormFieldConfig[] = [
         type: 'password',
         label: 'Password',
         placeholder: 'Min 8 characters',
-        description: 'Must contain at least one uppercase letter and one number',
+        // description: 'Must contain at least one uppercase letter and one number',
         required: true,
     },
     {
@@ -106,8 +106,9 @@ export default function Register() {
                         fields={registerFields}
                         onSubmit={handleSubmit}
                         submitButtonText={loading ? 'Creating account...' : 'Create Account'}
+                        validationMode='onChange'
                     />
-
+                    
                     {/* Divider */}
                     <div className="relative my-6">
                         <div className="absolute inset-0 flex items-center">
