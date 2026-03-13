@@ -187,7 +187,6 @@ body {
 
 
 /* Spinner styles */
-
 .spinner {
   animation: spinner-rotate 1s linear infinite;
 }
@@ -203,26 +202,17 @@ body {
 }
 
 .spinner-md {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
 }
 
 .spinner-lg {
-  width: 52px;
-  height: 52px;
+  width: 60px;
+  height: 60px;
 }
 
-.spinner-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.65);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
+.spinner-path {
+  stroke-linecap: round;
 }
 
 @keyframes spinner-rotate {
@@ -248,6 +238,33 @@ body {
   }
 }
 
+.spinner-fullscreen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: hsl(var(--background));
+  z-index: 9999;
+}
+
+.spinner-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(2px);
+  z-index: 9999;
+}
+
+.spinner-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
 
 /* Skeleton styles */
 .skeleton {
@@ -296,41 +313,4 @@ body {
   100% {
     transform: translateX(100%);
   }
-}
-
-
-/* Base toast style */
-.toast-root {
-  display: flex;
-  align-items: center;
-  padding: 12px 14px !important;
-  border-radius: 8px !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  gap: 8px !important;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.08) !important;
-}
-
-.toast-success {
-  background-color: #ecfdf5 !important;
-  color: #047857 !important;
-  border-left: 4px solid #10b981 !important;
-}
-
-.toast-error {
-  background-color: #fef2f2 !important;
-  color: #991b1b !important;
-  border-left: 4px solid #ef4444 !important;
-}
-
-.toast-warning {
-  background-color: #fffbeb !important;
-  color: #92400e !important;
-  border-left: 4px solid #f59e0b !important;
-}
-
-.toast-info {
-  background-color: #eff6ff !important;
-  color: #1e40af !important;
-  border-left: 4px solid #3b82f6 !important;
 }
