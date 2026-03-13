@@ -1,11 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import App from './App.tsx';
-
-
-
 import './index.css';
+import App from './App.tsx';
 import { ErrorBoundaryClass } from './components/ErrorBoundary.tsx';
 import { AuthProvider } from './context/AuthContext.tsx';
 
