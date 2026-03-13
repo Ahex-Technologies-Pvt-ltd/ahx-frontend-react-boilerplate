@@ -11,17 +11,15 @@ import { AuthProvider } from './context/AuthContext.tsx';
 
 
 
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string;
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string || "hvjfhv";
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <ErrorBoundaryClass  >
             <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
                 <AuthProvider>
-
                     <App />
                 </AuthProvider>
-
             </GoogleOAuthProvider>
         </ErrorBoundaryClass>
     </StrictMode>,

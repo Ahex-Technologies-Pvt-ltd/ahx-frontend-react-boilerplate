@@ -22,6 +22,7 @@ import {
     RHFRange,
     RHFFile,
     RHFHidden,
+    RFFOTP,
 } from "./FormField";
 
 
@@ -95,6 +96,9 @@ export function DynamicFieldRenderer<T extends FieldValues>({
 
         case "hidden":
             return <RHFHidden {...(field as any)} control={control} name={field.name as any} />;
+
+        case "otp":
+            return <RFFOTP {...(field as any)} control={control} name={field.name as any} />;
 
         default:
             return null;

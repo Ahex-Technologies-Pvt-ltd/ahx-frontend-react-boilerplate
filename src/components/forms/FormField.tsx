@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import React from "react";
 import type { FieldValues } from "react-hook-form";
 import {
     FormControl,
@@ -302,17 +303,41 @@ export const RHFEmail = createFormField<FieldValues>(
     ),
 );
 
-// RHFPassword - Password input field with RHF
+// RHFPassword - Password input field with RHF with show/hide toggle
 export const RHFPassword = createFormField<FieldValues>(
-    (field, props) => (
-        <Input
-            type="password"
-            {...field}
-            placeholder={props.placeholder}
-            disabled={props.disabled}
-            className={props.className}
-        />
-    ),
+    (field, props) => {
+        const [showPassword, setShowPassword] = React.useState(false);
+
+        return (
+            <div className="relative">
+                <Input
+                    type={showPassword ? "text" : "password"}
+                    {...field}
+                    placeholder={props.placeholder}
+                    disabled={props.disabled}
+                    className={cn(props.className, "pr-10")}
+                />
+                <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={props.disabled}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                    {showPassword ? (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-4.803m5.596-3.856a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    ) : (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    )}
+                </button>
+            </div>
+        );
+    },
 );
 
 // RHFUrl - URL input field with RHF
@@ -421,4 +446,94 @@ export const RHFHidden = createFormField<FieldValues>(
             className={props.className}
         />
     ),
+);
+
+// RFFOTP - OTP input field with RHF (multiple input boxes based on length)
+export const RFFOTP = createFormField<FieldValues>(
+    (field, props: any) => {
+        const length = props.length || 6;
+        const value = field.value || "";
+        const inputRefs = React.useRef<(HTMLInputElement | null)[]>([]);
+
+        const handleChange = (index: number, val: string) => {
+            // Only allow digits
+            if (!/^\d*$/.test(val)) return;
+
+            // Get current value as array
+            const valueArray = value.split("");
+            valueArray[index] = val;
+            const newValue = valueArray.join("");
+
+            // Update field value
+            field.onChange(newValue);
+
+            // Auto-focus to next input if digit entered
+            if (val && index < length - 1) {
+                inputRefs.current[index + 1]?.focus();
+            }
+        };
+
+        const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+            if (e.key === "Backspace") {
+                e.preventDefault();
+                const valueArray = value.split("");
+                valueArray[index] = "";
+                field.onChange(valueArray.join(""));
+
+                // Focus previous input on backspace
+                if (index > 0) {
+                    inputRefs.current[index - 1]?.focus();
+                }
+            } else if (e.key === "ArrowLeft" && index > 0) {
+                e.preventDefault();
+                inputRefs.current[index - 1]?.focus();
+            } else if (e.key === "ArrowRight" && index < length - 1) {
+                e.preventDefault();
+                inputRefs.current[index + 1]?.focus();
+            }
+        };
+
+        const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+            e.preventDefault();
+            const pastedData = e.clipboardData.getData("text");
+            const digits = pastedData.replace(/\D/g, "").slice(0, length);
+
+            if (digits) {
+                field.onChange(digits);
+                // Focus last input or next empty input
+                const nextIndex = Math.min(digits.length, length - 1);
+                inputRefs.current[nextIndex]?.focus();
+            }
+        };
+
+        return (
+            <div className="flex gap-2 justify-center">
+                {Array.from({ length }).map((_, index) => (
+                    <input
+                        key={index}
+                        ref={(el) => {
+                            inputRefs.current[index] = el;
+                        }}
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={1}
+                        value={value[index] || ""}
+                        onChange={(e) => handleChange(index, e.target.value)}
+                        onKeyDown={(e) => handleKeyDown(index, e)}
+                        onPaste={handlePaste}
+                        disabled={props.disabled}
+                        className={cn(
+                            "w-12 h-12 text-center text-lg font-semibold border-2 border-input rounded-lg",
+                            "focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20",
+                            "hover:border-primary/50 transition-colors",
+                            "disabled:opacity-50 disabled:cursor-not-allowed",
+                            props.className
+                        )}
+                        aria-label={`OTP digit ${index + 1}`}
+                    />
+                ))}
+            </div>
+        );
+    },
+    "flex justify-center",
 );
