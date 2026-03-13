@@ -22,8 +22,7 @@ export type FieldType =
   | "file"
   | "color"
   | "range"
-  | "hidden"
-  | "otp";
+  | "hidden";
 
 export interface FormOption {
   label: string;
@@ -58,7 +57,6 @@ export interface FormFieldConfig {
   rows?: number; // for textarea
   cols?: number; // for textarea
   isComma?: boolean; // for number input - show comma separated values (currency format)
-  length?: number; // for otp input - number of digits
 }
 
 export interface DynamicFormProps<T> {
