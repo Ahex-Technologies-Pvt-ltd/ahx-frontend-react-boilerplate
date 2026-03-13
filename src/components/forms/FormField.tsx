@@ -51,7 +51,7 @@ function createFormField<T extends FieldValues>(
             <FormField
                 control={control as any}
                 name={name}
-                render={({ field }: { field: any }) => (
+                render={({ field, fieldState }: { field: any; fieldState: any }) => (
                     <FormItem className={cn(containerClass, containerClassName)}>
                         {label && (
                             <FormLabel className={cn(labelClassName)}>
@@ -68,7 +68,7 @@ function createFormField<T extends FieldValues>(
                             </FormDescription>
                         )}
                         <FormMessage className={cn(errorClassName)}>
-                            {errorMsg}
+                            {errorMsg || fieldState.error?.message}
                         </FormMessage>
                     </FormItem>
                 )}
