@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
 import { DynamicForm } from '@/components/forms/DynamicForm';
 import { Button } from '@/components/ui/button';
@@ -32,19 +32,17 @@ const defaultValues: LoginFormData = {
 };
 
 export default function Login() {
-    const navigate = useNavigate();
     const { login, googleAuth, loading, error, clearError } = useAuth();
 
     const handleSubmit = useCallback(
         async (data: LoginFormData) => {
             try {
                 await login(data);
-                navigate('/dashboard');
             } catch {
                 // error is set inside AuthContext
             }
         },
-        [login, navigate],
+        [login],
     );
 
     const handleGoogleLogin = useGoogleLogin({
@@ -52,7 +50,6 @@ export default function Login() {
             clearError();
             try {
                 await googleAuth({ token: tokenResponse.access_token });
-                navigate('/dashboard');
             } catch {
                 // error is set inside AuthContext
             }
