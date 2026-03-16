@@ -1,13 +1,13 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import App from './App.tsx';
 import { AuthProvider, getAppAuthConfig } from './context/auth-context';
 
 
 
 const authMode = import.meta.env.VITE_AUTH_MODE === 'bearer' ? 'bearer' : 'cookie';
 import './index.css';
+import App from './App.tsx';
 import { ErrorBoundaryClass } from './components/ErrorBoundary.tsx';
 
 
