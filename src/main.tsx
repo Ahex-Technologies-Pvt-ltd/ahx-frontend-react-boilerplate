@@ -5,6 +5,8 @@ import './index.css';
 import App from './App.tsx';
 import { ErrorBoundaryClass } from './components/ErrorBoundary.tsx';
 import { AuthProvider } from './context/AuthContext.tsx';
+import { ThemeProvider } from './context/ThemeContext.tsx';
+import { Toaster } from './components/ui/sonner.tsx';
 
 
 
@@ -15,7 +17,10 @@ createRoot(document.getElementById('root')!).render(
         <ErrorBoundaryClass  >
             <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
                 <AuthProvider>
-                    <App />
+                    <ThemeProvider >
+                        <App />
+                        <Toaster />
+                    </ThemeProvider>
                 </AuthProvider>
             </GoogleOAuthProvider>
         </ErrorBoundaryClass>

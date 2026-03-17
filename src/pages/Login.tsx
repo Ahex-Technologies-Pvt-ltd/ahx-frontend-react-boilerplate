@@ -60,11 +60,11 @@ export default function Login() {
     });
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12">
+        <div className="flex min-h-screen items-center justify-center px-4 py-12">
             <div className="w-full max-w-md space-y-8">
                 {/* Header */}
                 <div className="text-center">
-                    <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+                    <h1 className="text-3xl font-bold tracking-tight">
                         Welcome back
                     </h1>
                     <p className="mt-2 text-sm text-gray-600">
@@ -73,7 +73,7 @@ export default function Login() {
                 </div>
 
                 {/* Card */}
-                <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+                <div className="rounded-2xl border border-mute-foreground p-8 shadow-sm">
                     {/* Error from AuthContext */}
                     {error && (
                         <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -93,10 +93,10 @@ export default function Login() {
                     {/* Divider */}
                     <div className="relative my-6">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-gray-200" />
+                            <div className="w-full border-t border-muted-foreground" />
                         </div>
                         <div className="relative flex justify-center text-sm">
-                            <span className="bg-white px-3 text-gray-500">or continue with</span>
+                            <span className="bg-background px-3 text-muted-foreground">or continue with</span>
                         </div>
                     </div>
 
