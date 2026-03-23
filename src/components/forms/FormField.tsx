@@ -6,7 +6,6 @@ import {
     FormField,
     FormItem,
     FormLabel,
-    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -51,7 +50,7 @@ function createFormField<T extends FieldValues>(
             <FormField
                 control={control as any}
                 name={name}
-                render={({ field }: { field: any }) => (
+                render={({ field, fieldState }: { field: any; fieldState: any }) => (
                     <FormItem className={cn(containerClass, containerClassName)}>
                         {label && (
                             <FormLabel className={cn(labelClassName)}>
@@ -67,9 +66,14 @@ function createFormField<T extends FieldValues>(
                                 {description}
                             </FormDescription>
                         )}
-                        <FormMessage className={cn(errorClassName)}>
+                        {/* <FormMessage className={cn(errorClassName)}>
                             {errorMsg}
-                        </FormMessage>
+                        </FormMessage> */}
+                        {fieldState?.error?.message || (
+                            <p className={cn("text-sm font-medium text-destructive", errorClassName)}>
+                                {fieldState.error?.message || errorMsg}
+                            </p>
+                        )}
                     </FormItem>
                 )}
             />

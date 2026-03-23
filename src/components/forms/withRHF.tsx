@@ -1,4 +1,4 @@
- 
+
 import type { FieldPath, FieldValues } from "react-hook-form";
 import type { Control } from "react-hook-form";
 import {
@@ -7,38 +7,37 @@ import {
     FormField,
     FormItem,
     FormLabel,
-    FormMessage,
 } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
 
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface WithRHFProps<T extends FieldValues> {
-  name: FieldPath<T>;
-   
-  control: Control<T, any>;
-  label?: string;
-  description?: string;
-  placeholder?: string;
-  disabled?: boolean;
-  required?: boolean;
-  className?: string;
-  containerClassName?: string;
-  labelClassName?: string;
-  descriptionClassName?: string;
-  errorClassName?: string;
-  errorMsg?: string;
+    name: FieldPath<T>;
+
+    control: Control<T, any>;
+    label?: string;
+    description?: string;
+    placeholder?: string;
+    disabled?: boolean;
+    required?: boolean;
+    className?: string;
+    containerClassName?: string;
+    labelClassName?: string;
+    descriptionClassName?: string;
+    errorClassName?: string;
+    errorMsg?: string;
 }
 
 export function withRHF<
-  T extends FieldValues,
-  P extends { className?: string; disabled?: boolean; placeholder?: string },
+    T extends FieldValues,
+    P extends { className?: string; disabled?: boolean; placeholder?: string },
 >(
     _Component: React.ComponentType<P>,
     renderField: (
-    field: any,
-    props: Omit<WithRHFProps<T> & P, "name" | "control">,
-  ) => React.ReactNode,
+        field: any,
+        props: Omit<WithRHFProps<T> & P, "name" | "control">,
+    ) => React.ReactNode,
 ) {
     return function RHFComponent({
         name,
@@ -60,7 +59,7 @@ export function withRHF<
             <FormField
                 control={control as any}
                 name={name}
-                render={({ field }: { field: any }) => (
+                render={({ field, fieldState }: { field: any; fieldState: any }) => (
                     <FormItem className={cn(containerClassName)}>
                         {label && (
                             <FormLabel className={cn(labelClassName)}>
@@ -89,9 +88,11 @@ export function withRHF<
                                 {description}
                             </FormDescription>
                         )}
-                        <FormMessage className={cn(errorClassName)}>
-                            {errorMsg}
-                        </FormMessage>
+                        {fieldState?.error?.message || (
+                            <p className={cn("text-sm font-medium text-destructive", errorClassName)}>
+                                {fieldState.error?.message || errorMsg}
+                            </p>
+                        )}
                     </FormItem>
                 )}
             />
