@@ -12,7 +12,7 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute = ({ children, roles, deny, redirectTo = '/home' }: PrivateRouteProps) => {
-const { isAuthenticated, user, isLoading } = useAuth();
+    const { isAuthenticated, user, isLoading } = useAuth();
     const location = useLocation();
 
     if (isLoading) return null;
