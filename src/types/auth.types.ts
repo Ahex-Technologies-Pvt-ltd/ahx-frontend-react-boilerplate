@@ -51,7 +51,16 @@ export interface GoogleAuthResponse {
     token: string
 }
 
-export interface AuthState {
+export interface VerifyEmailPayload {
+    token: string
+}
+
+export interface ResendVerificationPayload {
+    email: string
+}
+
+
+export interface AuthContextValue {
     user: AuthUser | null
     token: string | null
     isLoading: boolean

@@ -8,7 +8,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+//import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -145,7 +145,7 @@ const DataModal: React.FC<DataModalProps> = ({
                                     </DialogDescription>
                                 )}
                             </div>
-                            <Button
+                            {/* <Button
                                 type="button"
                                 variant="ghost"
                                 size="icon"
@@ -154,7 +154,7 @@ const DataModal: React.FC<DataModalProps> = ({
                             >
                                 <X className="h-4 w-4" />
                                 <span className="sr-only">Close</span>
-                            </Button>
+                            </Button> */}
                         </div>
                     </DialogHeader>
                 )}

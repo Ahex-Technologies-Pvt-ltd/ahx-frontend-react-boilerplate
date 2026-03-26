@@ -3,13 +3,24 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
 import { DynamicForm } from '@/components/forms/DynamicForm';
 import { Button } from '@/components/ui/button';
-import { authService } from '@/services';
-import { loginSchema, type LoginFormData } from '@/validations/authValidation';
+import { DataModal } from '@/components/modals';
+import { registerSchema, type RegisterFormData } from '@/validations/authValidation';
 import type { FormFieldConfig } from '@/components/forms/types';
+import { useAuth } from '../context/auth-context/useAuth';
+import { Mail } from 'lucide-react';
+import { authService } from '@/services';
 
 
 
-const loginFields: FormFieldConfig[] = [
+
+const registerFields: FormFieldConfig[] = [
+    {
+        name: 'name',
+        type: 'input',
+        label: 'Full Name',
+        placeholder: 'John Doe',
+        required: true,
+    },
     {
         name: 'email',
         type: 'email',
@@ -21,40 +32,56 @@ const loginFields: FormFieldConfig[] = [
         name: 'password',
         type: 'password',
         label: 'Password',
-        placeholder: 'Enter your password',
+        placeholder: 'Min 8 characters',
+        // description: 'Must contain at least one uppercase letter and one number',
+        required: true,
+    },
+    {
+        name: 'confirmPassword',
+        type: 'password',
+        label: 'Confirm Password',
+        placeholder: 'Re-enter your password',
         required: true,
     },
 ];
 
-const defaultValues: LoginFormData = {
+const defaultValues: RegisterFormData = {
+    name: '',
     email: '',
     password: '',
+    confirmPassword: '',
 };
 
-export default function Login() {
+export default function Register() {
     const navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(false);
+    const { isLoading } = useAuth();
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [registeredEmail, setRegisteredEmail] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [googleLoading, setGoogleLoading] = useState(false);
-
     const handleSubmit = useCallback(
-        async (data: LoginFormData) => {
-            setIsLoading(true);
+        async (data: RegisterFormData) => {
             setError(null);
-            await authService.login(data, {
+
+            authService.register(data, {
                 onSuccess: () => {
-                    navigate('/dashboard');
+                    setRegisteredEmail(data.email);
+                    setShowSuccessModal(true);
                 },
                 onError: (err) => {
-                    setError(err.message);
+                    setError(err.message || 'Registration failed');
                 },
             });
-            setIsLoading(false);
         },
-        [navigate],
+        [],
     );
 
-    const handleGoogleLogin = useGoogleLogin({
+    const handleSuccessModalClose = () => {
+        setShowSuccessModal(false);
+        navigate('/login');
+    };
+
+    const handleGoogleSignUp = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
 
             setGoogleLoading(true);
@@ -79,12 +106,12 @@ export default function Login() {
     });
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12">
+        <div className="flex min-h-screen items-center justify-center px-4 py-12">
             <div className="w-full max-w-md space-y-8">
                 {/* Header */}
                 <div className="text-center">
-                    <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-                        Welcome back
+                    <h1 className="text-3xl font-bold tracking-tight">
+                        Create an account
                     </h1>
                     <p className="mt-2 text-sm text-gray-600">
                         Sign in to your account to continue
@@ -92,8 +119,8 @@ export default function Login() {
                 </div>
 
                 {/* Card */}
-                <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-                    {/* Server error */}
+                <div className="rounded-2xl border border-border-mute-foreground p-8 shadow-sm">
+                    {/* Error from AuthContext */}
                     {error && (
                         <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                             {error}
@@ -101,10 +128,10 @@ export default function Login() {
                     )}
 
                     {/* Login Form */}
-                    <DynamicForm<LoginFormData>
-                        schema={loginSchema}
+                    <DynamicForm<RegisterFormData>
+                        schema={registerSchema}
                         defaultValues={defaultValues}
-                        fields={loginFields}
+                        fields={registerFields}
                         onSubmit={handleSubmit}
                         submitButtonText={isLoading ? 'Signing in...' : 'Sign In'}
                     />
@@ -112,10 +139,10 @@ export default function Login() {
                     {/* Divider */}
                     <div className="relative my-6">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-gray-200" />
+                            <div className="w-full border-t border-muted-foreground" />
                         </div>
                         <div className="relative flex justify-center text-sm">
-                            <span className="bg-white px-3 text-gray-500">or continue with</span>
+                            <span className="bg-background px-3 text-muted-foreground">or continue with</span>
                         </div>
                     </div>
 
@@ -124,7 +151,7 @@ export default function Login() {
                         type="button"
                         variant="outline"
                         className="w-full gap-3"
-                        onClick={() => handleGoogleLogin()}
+                        onClick={() => handleGoogleSignUp()}
                         disabled={googleLoading || isLoading}
                     >
                         <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
@@ -148,15 +175,55 @@ export default function Login() {
                         {googleLoading ? 'Signing in with Google...' : 'Sign in with Google'}
                     </Button>
 
-                    {/* Register Link */}
-                    <p className="mt-6 text-center text-sm text-gray-600">
-                        Don&apos;t have an account?{' '}
-                        <Link to="/register" className="font-medium text-primary hover:underline">
-                            Create one
+                    {/* Login Link */}
+                    <p className={`mt-6 text-center text-sm text-muted-foreground`}>
+                        Already have an account?{' '}
+                        <Link to="/login" className="font-medium text-primary hover:underline">
+                            Sign in
                         </Link>
                     </p>
                 </div>
             </div>
+
+            {/* Success Modal */}
+            <DataModal
+                isOpen={showSuccessModal}
+                onClose={handleSuccessModalClose}
+                title="Account Created Successfully!"
+                description="Registration Complete"
+                size="md"
+                showHeader={true}
+                showFooter={true}
+                closeButtonText="Go to Login"
+            >
+                <div className="flex flex-col items-center text-center py-6 px-4 space-y-5">
+
+                    {/* Icon */}
+                    <div className="rounded-full bg-primary/10 p-4">
+                        <Mail className="h-8 w-8 text-primary" />
+                    </div>
+
+                    {/* Main Message */}
+                    <div className="space-y-2">
+                        <p className="text-base font-medium text-foreground">
+                            A verification link has been sent
+                        </p>
+
+                        <p className="text-sm text-muted-foreground">
+                            to <span className="font-semibold text-foreground">{registeredEmail}</span>
+                        </p>
+                    </div>
+
+                    {/* Divider (optional but nice) */}
+                    <div className="w-full h-px bg-border" />
+
+                    {/* Description */}
+                    <p className="text-sm text-muted-foreground max-w-sm">
+                        Please check your email and click the link to verify your account and complete the registration process.
+                    </p>
+
+                </div>
+            </DataModal>
         </div>
     );
 }
