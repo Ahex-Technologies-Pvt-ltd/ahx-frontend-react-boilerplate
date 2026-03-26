@@ -25,7 +25,7 @@ const PrivateRoute = ({ children, roles, deny, redirectTo = '/home' }: PrivateRo
         return <Navigate to="/forbidden" replace />;
     }
 
-    if (deny && user && deny(user)) {
+    if (deny && user?.role && roles && deny(user.role)) {
         return <Navigate to={redirectTo} replace />;
     }
 

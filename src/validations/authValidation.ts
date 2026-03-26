@@ -32,5 +32,12 @@ export const registerSchema = z
         path: ['confirmPassword'],
     });
 
+export const resendVerificationSchema = z.object({
+    email: z.string().min(1, 'Email is required').email('Enter a valid email address'),
+});
+
+export type ResendVerificationFormData = z.infer<typeof resendVerificationSchema>
+
+
 export type LoginFormData = z.infer<typeof loginSchema>
 export type RegisterFormData = z.infer<typeof registerSchema>

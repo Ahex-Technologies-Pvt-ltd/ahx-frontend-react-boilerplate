@@ -1,3 +1,4 @@
+import type { ResendVerificationPayload, VerifyEmailPayload } from '@/types/auth.types';
 import { apiClient, API_ENDPOINTS } from '../api';
 import type { RequestCallbacks, RequestOptions } from '../api';
 import type {
@@ -96,5 +97,13 @@ export const authService = {
      */
     refreshSession(opts?: RequestOptions<null>) {
         return apiClient.post<null>(AUTH.REFRESH, undefined, opts);
+    },
+
+    verifyEmail(payload: VerifyEmailPayload, callbacks?: RequestCallbacks<null>) {
+        return apiClient.post<null>(AUTH.VERIFY_EMAIL, payload, callbacks);
+    },
+
+    resendVerification(payload: ResendVerificationPayload, callbacks?: RequestCallbacks<null>) {
+        return apiClient.post<null>(AUTH.RESEND_VERIFICATION, payload, callbacks);
     },
 };
