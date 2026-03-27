@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useState } from 'react';
 import type { TableProps, SortDirection } from './types';
 import Pagination from './Pagination';
 import { Table as UITable, TableHeader, TableBody, TableHead, TableRow, TableCell } from '../ui';
 import { cn } from '@/lib/utils';
-// import Skeleton from "../ui";
+import Skeleton from '../ui/skeleton';
 import { useSearchParams } from 'react-router-dom';
 
 
@@ -43,38 +43,54 @@ const SortIcon: React.FC<{ direction: SortDirection }> = ({ direction }) => {
 
 /** Search / filter bar */
 const FilterBar: React.FC<{
-    value: string
-    onChange: (v: string) => void
-}> = ({ value, onChange }) => (
-    <div className="px-4 py-3 border-b border-border flex items-center gap-2">
-        <svg
-            width={16}
-            height={16}
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="hsl(var(--muted-foreground))"
-            strokeWidth={1.8}
-        >
-            <circle cx={6.5} cy={6.5} r={4.5} />
-            <path d="M10.5 10.5l3 3" strokeLinecap="round" />
-        </svg>
-        <input
-            type="text"
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder="Search…"
-            className="border-none outline-none bg-transparent text-sm text-foreground w-full placeholder:text-muted-foreground"
-        />
-        {value && (
-            <button
-                onClick={() => onChange('')}
-                className="border-none bg-transparent cursor-pointer text-muted-foreground hover:text-foreground text-lg leading-none"
+    initialValue: string
+    onSearch: (v: string) => void
+}> = ({ initialValue, onSearch }) => {
+    const [value, setValue] = useState(initialValue);
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            onSearch(value);
+        }
+    };
+
+    return (
+        <div className="px-4 py-3 border-b border-border flex items-center gap-2">
+            <svg
+                width={16}
+                height={16}
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="hsl(var(--muted-foreground))"
+                strokeWidth={1.8}
             >
-                ×
+                <circle cx={6.5} cy={6.5} r={4.5} />
+                <path d="M10.5 10.5l3 3" strokeLinecap="round" />
+            </svg>
+            <input
+                type="text"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Search…"
+                className="border-none outline-none bg-transparent text-sm text-foreground flex-1 placeholder:text-muted-foreground"
+            />
+            <button
+                onClick={() => onSearch(value)}
+                className="px-3 py-1 bg-primary text-primary-foreground rounded text-sm hover:bg-primary/90"
+            >
+                Search
             </button>
-        )}
-    </div>
-);
+            {value && (
+                <button
+                    onClick={() => setValue('')}
+                    className="border-none bg-transparent cursor-pointer text-muted-foreground hover:text-foreground text-lg leading-none"
+                >
+                    ×
+                </button>
+            )}
+        </div>
+    );
+};
 
 function Table<T extends Record<string, unknown>>({
     columns,
@@ -96,38 +112,17 @@ function Table<T extends Record<string, unknown>>({
     stickyHeader = false,
 }: TableProps<T>) {
     const [searchParams, setSearchParams] = useSearchParams();
-    useEffect(() => {
-        const sortField = searchParams.get('sortField');
-        const sortOrder = searchParams.get('sortOrder');
-        const query = searchParams.get('query');
-
-        if (sortField && onSortChange) {
-            onSortChange({
-                field: sortField,
-                direction: sortOrder as 'asc' | 'desc',
-            });
-        }
-
-        if (query && onFilterChange) {
-            onFilterChange({ query });
-        }
-    }, [searchParams, onSortChange, onFilterChange]);
     const handleSort = (field: string) => {
         if (!onSortChange) return;
 
         const activeDirection = sortState?.field === field ? sortState.direction : null;
 
-        const next = activeDirection === 'asc' ? 'desc' : activeDirection === 'desc' ? null : 'asc';
+        const next = activeDirection === 'asc' ? 'desc' : 'asc';
 
         const params = new URLSearchParams(searchParams);
 
         params.set('sortField', field);
-
-        if (next) {
-            params.set('sortOrder', next);
-        } else {
-            params.delete('sortOrder');
-        }
+        params.set('sortOrder', next);
 
         setSearchParams(params);
 
@@ -169,7 +164,11 @@ function Table<T extends Record<string, unknown>>({
             >
                 {/* ── Filter bar ── */}
                 {showSearch && (
-                    <FilterBar value={filterState?.query ?? ''} onChange={handleSearch} />
+                    <FilterBar
+                        key={filterState?.query ?? ''}
+                        initialValue={filterState?.query ?? ''}
+                        onSearch={handleSearch}
+                    />
                 )}
 
                 {/* ── Table ── */}
@@ -237,10 +236,10 @@ function Table<T extends Record<string, unknown>>({
                                                             : 'text-left',
                                                 )}
                                             >
-                                                {/* <Skeleton
-                                                   variant="line"
-                                                   width={ri % 2 === 0 ? '60%' : '80%'}
-                                                /> */}
+                                                <Skeleton
+                                                    variant="line"
+                                                    width={ri % 2 === 0 ? '60%' : '80%'}
+                                                />
                                             </TableCell>
                                         ))}
                                     </TableRow>
