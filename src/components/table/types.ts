@@ -25,9 +25,28 @@ export interface FilterState {
     [key: string]: unknown
 }
 
+export interface TableQueryState {
+    page: number
+    pageSize: number
+    query: string
+    sortField: string
+    sortDirection: Exclude<SortDirection, null>
+}
+
+export interface TableFetchResult<T> {
+    data: T[]
+    total: number
+    emptyMessage?: string
+}
+
+export interface TableDataSource<T> {
+    fetchData: (query: TableQueryState) => Promise<TableFetchResult<T>>
+    initialQuery?: Partial<TableQueryState>
+}
+
 export interface TableProps<T = Record<string, unknown>> {
     columns: ColumnConfig<T>[]
-    data: T[]
+    data?: T[]
     rowKey: keyof T & string
     loading?: boolean
     emptyMessage?: string
@@ -43,4 +62,5 @@ export interface TableProps<T = Record<string, unknown>> {
     showSearch?: boolean
     className?: string
     stickyHeader?: boolean
+    dataSource?: TableDataSource<T>
 }

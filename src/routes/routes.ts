@@ -29,6 +29,12 @@ export const routes: RouteConfig[] = [
         component: lazy(() => import('../pages/Home')),
         isPrivate: true,
     },
+    {
+        path: '/admin/users',
+        component: lazy(() => import('../pages/Admin/Users')),
+        isPrivate: false,
+        roles: ['admin', 'superAdmin'],
+    },
     // {
     //     path: '/admin',
     //     component: lazy(() => import('../layouts/AdminLayout')),

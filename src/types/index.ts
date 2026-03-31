@@ -9,3 +9,5 @@ export type {
     ForgotPasswordPayload,
     ResetPasswordPayload,
 } from './auth.types';
+
+export type { User, UsersResponse } from './user.types';
