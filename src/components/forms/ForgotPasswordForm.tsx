@@ -9,6 +9,8 @@ import {
 } from "@/validations/authValidation";
 
 import type { FormFieldConfig } from "@/components/forms/types";
+import { useNavigate } from "react-router-dom";
+
 
 
 const emailResetFields: FormFieldConfig[] = [
@@ -26,9 +28,8 @@ const defaultValues: ForgotPasswordFormData = {
 };
 
 export function EmailResetForm() {
-    const navigate = (path: string) => {
-        console.log("Navigate:", path);
-    }; const [success, setSuccess] = useState(false);
+    const navigate = useNavigate();
+    const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
