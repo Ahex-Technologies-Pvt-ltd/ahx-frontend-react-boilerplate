@@ -1,3 +1,4 @@
+
 import { lazy } from 'react';
 import type { LazyExoticComponent } from 'react';
 
@@ -35,6 +36,13 @@ export const routes: RouteConfig[] = [
         isPrivate: false,
         roles: ['admin', 'superAdmin'],
     },
+    {
+        path: '/admin/users/:id',
+        component: lazy(() => import('../pages/Admin/UserDetails')),
+        isPrivate: false,
+        roles: ['admin', 'superAdmin'],
+    },
+
     // {
     //     path: '/admin',
     //     component: lazy(() => import('../layouts/AdminLayout')),

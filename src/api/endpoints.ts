@@ -18,5 +18,8 @@ export const API_ENDPOINTS = {
         UPDATE: (id: string) => `/users/${id}`,
         PATCH: (id: string) => `/users/${id}`,
         DELETE: (id: string) => `/users/${id}`,
+        SOFT_DELETE: (id: string) => `/users/${id}/soft-delete`,
     },
+    AUDIT_LOGS: '/api/v1/audit-logs',
+    USER_DEVICES: (id: string) => `/users/${id}/devices`,
 } as const;
