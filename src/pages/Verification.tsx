@@ -1,22 +1,40 @@
-import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { CheckCircle, XCircle } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import Spinner from '@/components/ui/spinner';
-import ResendVerification from '@/components/ResendVerification';
-import { authService } from '@/services';
-import { showToast } from '@/lib/toast';
+import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { apiClient } from '@/api/client';
+import { API_ENDPOINTS } from '@/api/endpoints';
 
 
 
-export default function Verification() {
+const Verification: React.FC = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(true);
-    const [verified, setVerified] = useState(false);
-
     const token = searchParams.get('token');
+
+    const [loading, setLoading] = useState(true);
+    const [success, setSuccess] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const handleVerification = useCallback(async () => {
+        if (!token) return;
+
+        try {
+            setLoading(true);
+            await apiClient.post(API_ENDPOINTS.AUTH.VERIFY_EMAIL, { token });
+            setSuccess(true);
+        } catch (error: unknown) {
+            const errorMessage =
+            error && typeof error === 'object' && 'response' in error
+                ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+                : 'Verification failed. The link may be expired or invalid.';
+            setError(errorMessage || 'Verification failed. The link may be expired or invalid.');
+        } finally {
+            setLoading(false);
+        }
+    }, [token]);
+
 
     useEffect(() => {
         if (token) {
@@ -24,113 +42,84 @@ export default function Verification() {
         } else {
             setLoading(false);
         }
-    }, [token]);
-
-    const handleVerification = async () => {
-        if (!token) return;
-
-        setLoading(true);
-
-        authService.verifyEmail(
-            { token },
-            {
-                onSuccess: () => {
-                    setVerified(true);
-                    setLoading(false);
-                    showToast('Email verified successfully!', 'success');
-                    setTimeout(() => navigate('/login'), 2000);
-                },
-                onError: (err) => {
-                    setLoading(false);
-                    setVerified(false);
-                    showToast(err.message || 'Verification failed', 'error');
-                },
-            },
-        );
-    };
+    }, [token, handleVerification]);
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12">
-            <div className="w-full max-w-md space-y-8">
-                {/* Header */}
-                <div className="text-center">
-                    <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-                        Email Verification
-                    </h1>
-                </div>
+            <Card className="w-full max-w-md">
+                <CardHeader className="text-center">
+                    <CardTitle className="text-2xl font-bold">Email Verification</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center space-y-4">
+                    {loading && (
+                        <div className="flex flex-col items-center space-y-4">
+                            <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+                            <p className="text-gray-600">Verifying your email...</p>
+                        </div>
+                    )}
 
-                {/* Loading State */}
-                {loading && (
-                    <Card className="shadow-sm">
-                        <CardHeader className="text-center">
-                            <div className="flex justify-center mb-4">
-                                <Spinner size="lg" center />
+                    {success && (
+                        <div className="flex flex-col items-center space-y-4">
+                            <CheckCircle className="h-12 w-12 text-green-600" />
+                            <div className="space-y-2">
+                                <h3 className="text-lg font-semibold text-green-800">
+                                    Email Verified Successfully!
+                                </h3>
+                                <p className="text-gray-600">
+                                    Your email has been verified. You can now log in to your
+                                    account.
+                                </p>
                             </div>
-                            <CardTitle className="text-xl">Verifying Email</CardTitle>
-                            <CardDescription>
-                                Please wait while we verify your email address...
-                            </CardDescription>
-                        </CardHeader>
-                    </Card>
-                )}
-
-                {/* Verified State */}
-                {!loading && verified && (
-                    <Card className="shadow-sm">
-                        <CardHeader className="text-center">
-                            <div className="flex justify-center mb-4">
-                                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                                    <CheckCircle className="w-8 h-8 text-green-600" />
-                                </div>
-                            </div>
-                            <CardTitle className="text-xl text-green-700">
-                                Email Verified!
-                            </CardTitle>
-                            <CardDescription>
-                                Your email has been successfully verified. Redirecting to login...
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <Button asChild variant="default" className="w-full">
-                                <Link to="/login">Continue to Login</Link>
-                            </Button>
-                        </CardContent>
-                    </Card>
-                )}
-
-                {/* Failed State or No Token - Show Resend Component */}
-                {!loading && !verified && (
-                    <div className="space-y-6">
-                        {token && (
-                            <Card className="shadow-sm">
-                                <CardHeader className="text-center">
-                                    <div className="flex justify-center mb-4">
-                                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                                            <XCircle className="w-8 h-8 text-red-600" />
-                                        </div>
-                                    </div>
-                                    <CardTitle className="text-xl text-red-700">
-                                        Verification Failed
-                                    </CardTitle>
-                                    <CardDescription className="text-red-600">
-                                        The verification link is invalid or has expired.
-                                    </CardDescription>
-                                </CardHeader>
-                            </Card>
-                        )}
-
-                        {/* Resend Verification Component */}
-                        <ResendVerification />
-
-                        {/* Back to Login */}
-                        <div className="text-center">
-                            <Button asChild variant="ghost" className="text-sm">
-                                <Link to="/login">Back to Login</Link>
+                            <Button onClick={() => navigate('/login')} className="w-full">
+                                Go to Login
                             </Button>
                         </div>
-                    </div>
-                )}
-            </div>
+                    )}
+
+                    {error && (
+                        <div className="flex flex-col items-center space-y-4">
+                            <XCircle className="h-12 w-12 text-red-600" />
+                            <div className="space-y-2">
+                                <h3 className="text-lg font-semibold text-red-800">
+                                    Verification Failed
+                                </h3>
+                                <p className="text-gray-600">{error}</p>
+                            </div>
+                            <div className="flex space-x-2 w-full">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => navigate('/login')}
+                                    className="flex-1"
+                                >
+                                    Go to Login
+                                </Button>
+                                <Button onClick={() => navigate('/register')} className="flex-1">
+                                    Register Again
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+
+                    {!token && !loading && (
+                        <div className="flex flex-col items-center space-y-4">
+                            <XCircle className="h-12 w-12 text-red-600" />
+                            <div className="space-y-2">
+                                <h3 className="text-lg font-semibold text-red-800">
+                                    Invalid Verification Link
+                                </h3>
+                                <p className="text-gray-600">
+                                    The verification link is missing or invalid.
+                                </p>
+                            </div>
+                            <Button onClick={() => navigate('/register')} className="w-full">
+                                Register Again
+                            </Button>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
         </div>
     );
-}
+};
+
+export default Verification;
