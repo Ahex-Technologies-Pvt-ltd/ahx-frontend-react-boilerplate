@@ -9,6 +9,8 @@ import {
 } from "@/validations/authValidation";
 
 import type { FormFieldConfig } from "@/components/forms/types";
+import { useNavigate } from "react-router-dom";
+
 
 
 const changePasswordFields: FormFieldConfig[] = [
@@ -36,9 +38,7 @@ const defaultValues: ChangePasswordFormData = {
 export function ChangePasswordForm() {
     const token = "test-token";
 
-    const navigate = (path: string) => {
-        console.log("Navigate:", path);
-    };
+    const navigate = useNavigate();
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
